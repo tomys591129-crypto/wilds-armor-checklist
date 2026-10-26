@@ -1,95 +1,82 @@
+
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0f766e">
-<title>ワイルズ防具コンプリート</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WILDS COMPENDIUM Prototype</title>
 <style>
-:root{--bg:#f3f7f7;--panel:#fff;--ink:#172525;--muted:#617171;--teal:#0f766e;--gold:#f2b90b;--line:#dce6e5;--red:#b42318}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}header{background:#123b3a;color:#fff;padding:18px 16px}header h1{font-size:1.25rem;margin:0 0 6px}header p{margin:0;color:#d7eeeb;font-size:.88rem}main{max-width:1050px;margin:auto;padding:14px;display:grid;gap:14px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 2px 7px #183a3a0a}.panel h2{font-size:1.03rem;margin:0 0 12px}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.stat{background:#edf7f5;border-radius:10px;padding:10px}.stat b{display:block;font-size:1.25rem;color:var(--teal)}.stat span{font-size:.75rem;color:var(--muted)}.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.controls input,.controls select,.material-row input{width:100%;padding:10px;border:1px solid #cbd8d7;border-radius:9px;background:white;color:var(--ink);font:inherit}.filters{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.btn{border:0;border-radius:9px;padding:10px 12px;background:var(--teal);color:white;font:inherit;font-weight:650;cursor:pointer}.btn.secondary{background:#e8f2f1;color:#174a47}.btn.warn{background:#fff0ed;color:var(--red)}.armor-list{display:grid;gap:9px}.armor{border:1px solid var(--line);border-radius:11px;padding:11px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}.armor h3{font-size:.98rem;margin:0 0 5px}.meta{font-size:.78rem;color:var(--muted);line-height:1.55}.materials{font-size:.82rem;margin-top:7px;line-height:1.65}.armor label{display:flex;gap:7px;align-items:center;white-space:nowrap;font-size:.85rem}.armor input[type=checkbox]{width:20px;height:20px;accent-color:var(--teal)}.material-list{display:grid;gap:8px}.material-row{display:grid;grid-template-columns:1fr 76px 78px;gap:8px;align-items:center;border-bottom:1px solid #edf1f1;padding:7px 0}.material-row:last-child{border:0}.material-name{font-size:.88rem}.material-sub{display:block;color:var(--muted);font-size:.73rem}.qty{font-size:.8rem;color:var(--muted);text-align:right}.notice{font-size:.82rem;color:var(--muted);line-height:1.6}.error{color:var(--red)}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.loading{padding:20px;text-align:center;color:var(--muted)}footer{max-width:1050px;margin:auto;padding:0 16px 22px;color:var(--muted);font-size:.75rem;line-height:1.5}@media(min-width:760px){main{grid-template-columns:1.15fr .85fr}.wide{grid-column:1/-1}.controls{grid-template-columns:2fr 1fr 1fr}.armor-list{grid-template-columns:1fr 1fr}}
+:root{--bg:#1f2123;--panel:#2b2d2f;--line:#555;--gold:#c2a06a;--text:#ece7dd;--muted:#a9a49b}
+[data-theme=light]{--bg:#f4f0e8;--panel:#fff;--line:#d7d0c4;--gold:#8e7044;--text:#222;--muted:#666}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,"Noto Sans JP",sans-serif}
+header{padding:16px;background:#242628;border-bottom:1px solid var(--line);position:sticky;top:0}
+[data-theme=light] header{background:#fff}
+.top{display:flex;justify-content:space-between;align-items:center}
+button{background:#3a3d40;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+button.primary{background:var(--gold);color:#111;border-color:var(--gold);font-weight:700}
+main{max-width:900px;margin:auto;padding:14px}
+.series{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:16px}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.icon{aspect-ratio:1;border:2px solid #6f6f6f;border-radius:12px;width:100%;display:grid;place-items:center;background:#181818;transition:.2s}
+.icon.done{background:#565b57;border-color:#d5c8a5;filter:none}
+.icon.todo{filter:brightness(.45)}
+.part{font-size:12px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.big{font-size:24px;color:var(--gold);font-weight:700}
+@media(max-width:560px){.grid{gap:8px}}
 </style>
 </head>
 <body>
-<header><h1>ワイルズ防具コンプリート</h1><p>上位防具の作成状況・素材の所持数・不足数を管理</p></header>
+<header><div class="top"><div><div style="font-size:18px;font-weight:700">WILDS COMPENDIUM</div><div style="font-size:11px;color:var(--gold)">ARMOR & MATERIALS</div></div><button id="theme">â˜¾ ãƒ€ãƒ¼ã‚¯</button></div></header>
 <main>
-<section class="panel wide">
-<h2>進捗</h2><div class="stats"><div class="stat"><b id="total">—</b><span>上位防具の点数</span></div><div class="stat"><b id="made">0</b><span>作成済み</span></div><div class="stat"><b id="rate">0%</b><span>コンプリート率</span></div></div>
-<p id="status" class="notice">日本語の防具データを読み込み中…初回は少し時間がかかることがあります。</p>
-</section>
-<section class="panel">
-<h2>防具一覧</h2>
-<div class="controls">
-<input id="search" placeholder="防具名・シリーズ名で検索">
-<select id="part"><option value="">全部位</option><option value="head">頭</option><option value="chest">胴</option><option value="arms">腕</option><option value="waist">腰</option><option value="legs">脚</option></select>
-<select id="state"><option value="all">すべて</option><option value="todo">未作成</option><option value="done">作成済み</option></select>
+<div class="stats">
+<div class="card"><div class="big" id="crafted">0</div>ä½œè£½æ¸ˆã¿</div>
+<div class="card"><div class="big" id="remain">20</div>æœªä½œè£½</div>
+<div class="card"><div class="big" id="rate">0%</div>é€²æ—</div>
 </div>
-<div class="filters"><button class="btn secondary" id="refresh">データ再読み込み</button></div>
-<div id="armorList" class="armor-list" style="margin-top:12px"><div class="loading">読み込み中…</div></div>
-</section>
-<section class="panel">
-<h2>素材の所持数・不足数</h2>
-<p class="notice">未作成の防具を作るために必要な素材を集計します。作成済みの防具の素材は必要数から除外されます。</p>
-<div id="materialList" class="material-list"><div class="loading">防具データ読み込み後に表示します。</div></div>
-</section>
-<section class="panel wide">
-<h2>データのバックアップ・復元</h2>
-<p class="notice">作成状況と素材所持数はこのブラウザに保存されます。機種変更・ブラウザデータ消去に備えて、定期的にJSONを保存してください。バックアップにはゲームのマスターデータは含まず、個人の進捗のみを保存します。</p>
-<div class="toolbar"><button class="btn" id="export">進捗をJSON保存</button><button class="btn secondary" id="importBtn">JSONを読み込む</button><input id="importFile" type="file" accept=".json,application/json" hidden><button class="btn warn" id="reset">進捗をリセット</button></div>
-</section>
+<div id="list"></div>
 </main>
-<footer>防具データ提供元：Monster Hunter Database API（wilds.mhdb.io）。ファン制作の非公式ツールであり、CAPCOM公式ではありません。APIの内容・日本語訳・ゲーム更新との一致は完全性を保証できません。</footer>
 <script>
-const API_URLS=['https://wilds.mhdb.io/ja/armor','https://wilds.mhdb.io/en/armor'];
-const PARTS={head:'頭',chest:'胴',arms:'腕',waist:'腰',legs:'脚'};
-const SAVE_KEY='wilds-armor-checklist-player-v2';
-let armorData=[], langUsed='ja';
-let player={armorStatus:{},materialsOwned:{}};
-const $=id=>document.getElementById(id);
-function loadPlayer(){try{const x=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');player={armorStatus:x.armorStatus||{},materialsOwned:x.materialsOwned||{}}}catch(e){player={armorStatus:{},materialsOwned:{}}}}
-function savePlayer(){localStorage.setItem(SAVE_KEY,JSON.stringify(player));renderStats();renderMaterials()}
-function armorKey(a){return String(a.id ?? ((a.armorSet?.gameId||a.armorSet?.id||'set')+'-'+a.kind+'-'+a.name))}
-function isDone(a){return !!player.armorStatus[armorKey(a)]}
-function armorMaterials(a){return (a.crafting?.materials||[]).map(m=>({id:String(m.item?.id??m.item?.gameId??m.item?.name),name:m.item?.name||'名称不明の素材',quantity:Number(m.quantity)||0})).filter(m=>m.quantity>0)}
-async function loadData(){
- $('status').textContent='日本語の防具データを読み込み中…';
- $('armorList').innerHTML='<div class="loading">読み込み中…</div>';
- let data=null,err=null;
- for(let i=0;i<API_URLS.length;i++){try{const r=await fetch(API_URLS[i],{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();if(!Array.isArray(d))throw new Error('データ形式が想定外です');data=d;langUsed=i===0?'ja':'en';break}catch(e){err=e}}
- if(!data){$('status').innerHTML='<span class="error">防具データを取得できませんでした。</span> ネット接続を確認して「データ再読み込み」を押してください。APIが一時停止中の可能性もあります。';$('armorList').innerHTML='';return}
- armorData=data.filter(a=>a.rank==='high'&&PARTS[a.kind]).sort((a,b)=>(PARTS[a.kind]||'').localeCompare(PARTS[b.kind]||'','ja')||String(a.name).localeCompare(String(b.name),'ja'));
- $('status').textContent=`データ取得成功：${langUsed==='ja'?'日本語':'英語'}データ。上位防具 ${armorData.length} 点を読み込みました。`;
- renderAll();
+const KEY='wilds_proto_v1';
+const base=[
+ {name:'ãƒœãƒ¼ãƒ³Î±',parts:['é ­','èƒ´','è…•','è…°','è„š']},
+ {name:'ãƒœãƒ¼ãƒ³Î²',parts:['é ­','èƒ´','è…•','è…°','è„š']},
+ {name:'ã‚¢ãƒ­ã‚¤Î±',parts:['é ­','èƒ´','è…•','è…°','è„š']},
+ {name:'ã‚¢ãƒ­ã‚¤Î²',parts:['é ­','èƒ´','è…•','è…°','è„š']}
+];
+let state=JSON.parse(localStorage.getItem(KEY)||'{}');
+state.done=state.done||{};
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
+function render(){
+ let total=0,done=0;
+ const root=document.getElementById('list');root.innerHTML='';
+ base.forEach((s,si)=>{
+  const box=document.createElement('div');box.className='series';
+  box.innerHTML=`<div class="head"><div><b>${s.name}</b></div><div style="color:var(--gold)">${s.parts.filter((_,i)=>state.done[si+'-'+i]).length}/${s.parts.length}</div></div>`;
+  const g=document.createElement('div');g.className='grid';
+  s.parts.forEach((p,pi)=>{
+   total++;
+   const id=si+'-'+pi;
+   if(state.done[id])done++;
+   const cell=document.createElement('div');cell.className='item';
+   cell.innerHTML=`<button class="icon ${state.done[id]?'done':'todo'}" data-id="${id}" style="padding:0"><div style="font-size:38px">ðŸ›¡ï¸</div></button><div class="part">${p}</div>`;
+   g.appendChild(cell);
+  });
+  box.appendChild(g);root.appendChild(box);
+ });
+ document.querySelectorAll('.icon').forEach(b=>b.onclick=()=>{const id=b.dataset.id;state.done[id]=!state.done[id];save();});
+ document.getElementById('crafted').textContent=done;
+ document.getElementById('remain').textContent=total-done;
+ document.getElementById('rate').textContent=Math.round(done/total*100)+'%';
 }
-function renderStats(){const total=armorData.length,done=armorData.filter(isDone).length;$('total').textContent=total;$('made').textContent=done;$('rate').textContent=total?Math.round(done/total*100)+'%':'0%'}
-function renderArmor(){
- const q=$('search').value.trim().toLocaleLowerCase(),part=$('part').value,state=$('state').value;
- const filtered=armorData.filter(a=>(!part||a.kind===part)&&(!q||[a.name,a.armorSet?.name].filter(Boolean).some(s=>s.toLocaleLowerCase().includes(q)))&&(state==='all'||(state==='done'?isDone(a):!isDone(a))));
- $('armorList').innerHTML='';
- if(!filtered.length){$('armorList').innerHTML='<div class="loading">条件に合う防具がありません。</div>';return}
- for(const a of filtered){const done=isDone(a),mats=armorMaterials(a);const card=document.createElement('article');card.className='armor';
- const info=document.createElement('div');const h=document.createElement('h3');h.textContent=a.name;info.append(h);
- const meta=document.createElement('div');meta.className='meta';meta.textContent=`${PARTS[a.kind]||a.kind}｜${a.armorSet?.name||'シリーズ情報なし'}｜レア度 ${a.rarity??'—'}`;info.append(meta);
- const mat=document.createElement('div');mat.className='materials';mat.textContent=mats.length?'必要素材：'+mats.map(m=>`${m.name} ×${m.quantity}`).join('、'):'必要素材データなし';info.append(mat);
- const label=document.createElement('label');const cb=document.createElement('input');cb.type='checkbox';cb.checked=done;cb.setAttribute('aria-label',a.name+' 作成済み');cb.addEventListener('change',()=>{player.armorStatus[armorKey(a)]=cb.checked;savePlayer();renderArmor()});label.append(cb,document.createTextNode('作成済み'));card.append(info,label);$('armorList').append(card)}
-}
-function renderMaterials(){
- const need=new Map();
- for(const a of armorData){if(isDone(a))continue;for(const m of armorMaterials(a)){const old=need.get(m.id)||{id:m.id,name:m.name,qty:0};old.qty+=m.quantity;need.set(m.id,old)}}
- const rows=[...need.values()].sort((a,b)=>a.name.localeCompare(b.name,'ja'));$('materialList').innerHTML='';
- if(!rows.length){$('materialList').innerHTML='<div class="loading">未作成の防具がないか、素材データがありません。</div>';return}
- for(const m of rows){const owned=Number(player.materialsOwned[m.id]||0),short=Math.max(0,m.qty-owned),row=document.createElement('div');row.className='material-row';
- const name=document.createElement('div');name.className='material-name';name.textContent=m.name;const sub=document.createElement('span');sub.className='material-sub';sub.textContent=`必要 ${m.qty}｜不足 ${short}`;name.append(sub);
- const qty=document.createElement('div');qty.className='qty';qty.textContent='所持数';
- const input=document.createElement('input');input.type='number';input.min='0';input.step='1';input.inputMode='numeric';input.value=owned;input.setAttribute('aria-label',m.name+' 所持数');input.addEventListener('change',()=>{player.materialsOwned[m.id]=Math.max(0,Math.floor(Number(input.value)||0));savePlayer()});
- row.append(name,qty,input);$('materialList').append(row)}
-}
-function renderAll(){renderStats();renderArmor();renderMaterials()}
-$('search').addEventListener('input',renderArmor);$('part').addEventListener('change',renderArmor);$('state').addEventListener('change',renderArmor);$('refresh').addEventListener('click',loadData);
-$('export').addEventListener('click',()=>{const data={format:'wilds-armor-checklist-player',version:2,exportedAt:new Date().toISOString(),armorStatus:player.armorStatus,materialsOwned:player.materialsOwned};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='wilds-armor-progress.json';a.click();URL.revokeObjectURL(url)});
-$('importBtn').addEventListener('click',()=>$('importFile').click());
-$('importFile').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.format!=='wilds-armor-checklist-player'||!d.armorStatus||!d.materialsOwned)throw new Error('このアプリの進捗バックアップではありません');if(!confirm('現在の進捗を、読み込むバックアップの内容で置き換えます。続けますか？'))return;player={armorStatus:d.armorStatus,materialsOwned:d.materialsOwned};savePlayer();renderAll();alert('進捗を復元しました')}catch(err){alert('読み込みできませんでした：'+err.message)}finally{e.target.value=''}});
-$('reset').addEventListener('click',()=>{if(confirm('このブラウザに保存された作成状況と素材所持数をすべてリセットします。よろしいですか？')){player={armorStatus:{},materialsOwned:{}};savePlayer();renderAll()}});
-loadPlayer();loadData();
+const tkey='wilds_theme';
+function theme(t){document.documentElement.dataset.theme=t;localStorage.setItem(tkey,t);document.getElementById('theme').textContent=t==='dark'?'â˜¾ ãƒ€ãƒ¼ã‚¯':'â˜€ ãƒ©ã‚¤ãƒˆ'}
+theme(localStorage.getItem(tkey)||'dark');
+document.getElementById('theme').onclick=()=>theme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+render();
 </script>
-</body></html>
+</body>
+</html>
