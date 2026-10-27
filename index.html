@@ -29,14 +29,63 @@
 :root[data-theme="dark"] .part-button.is-done{background:#263d38;color:#edf6f4;border-color:#668d81}
 :root[data-theme="dark"] .part-button:not(.is-done){background:#0b1110;color:#eaf2f0;border-color:#526563}
 :root[data-theme="dark"] .part-wish{background:transparent;color:#f2c94c}
-/* 五十音インデックス用スタイル */
-.kana-index{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0 4px}
-.kana-btn{flex:1;min-width:32px;padding:8px 4px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer;font-weight:700;font-size:0.9rem;text-align:center}
-.kana-btn:hover,.kana-btn:active{background:var(--teal);color:#fff;border-color:var(--teal)}
-:root[data-theme="dark"] .kana-btn{background:#263a36;color:#e5f5f1;border-color:#49635d}
-:root[data-theme="dark"] .kana-btn:hover,:root[data-theme="dark"] .kana-btn:active{background:var(--teal);color:#fff}
-.kana-header{padding:6px 12px;margin:20px 0 10px;background:var(--teal);color:#fff;border-radius:6px;font-weight:800;position:sticky;top:56px;z-index:10;box-shadow:0 2px 5px #00000020}
-:root[data-theme="dark"] .kana-header{background:#22a99b;color:#101817}
+/* 五十音インデックス用スタイル（固定表示対応） */
+.kana-index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  position: sticky;
+  top: 50px; /* タブナビゲーションの真下付近に固定 */
+  z-index: 90;
+  background: var(--panel);
+  padding: 10px 14px;
+  margin: 10px -14px 15px -14px;
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 4px 8px #00000008;
+}
+:root[data-theme="dark"] .kana-index {
+  box-shadow: 0 4px 8px #00000020;
+}
+.kana-btn {
+  flex: 1;
+  min-width: 32px;
+  padding: 8px 4px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-align: center;
+}
+.kana-btn:hover, .kana-btn:active {
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
+}
+:root[data-theme="dark"] .kana-btn {
+  background: #263a36;
+  color: #e5f5f1;
+  border-color: #49635d;
+}
+:root[data-theme="dark"] .kana-btn:hover, :root[data-theme="dark"] .kana-btn:active {
+  background: var(--teal);
+  color: #fff;
+}
+/* 行の見出しの固定を解除し、通常表示にする */
+.kana-header {
+  padding: 6px 12px;
+  margin: 20px 0 10px;
+  background: var(--teal);
+  color: #fff;
+  border-radius: 6px;
+  font-weight: 800;
+}
+:root[data-theme="dark"] .kana-header {
+  background: #22a99b;
+  color: #101817;
+}
 </style>
 </head>
 <body>
@@ -52,7 +101,6 @@
 <div class="controls"><input id="search" placeholder="シリーズ名で検索（防具名も検索対象）">
 <select id="part"><option value="">全部位</option><option value="head">頭</option><option value="chest">胴</option><option value="arms">腕</option><option value="waist">腰</option><option value="legs">脚</option></select>
 <select id="state"><option value="all">すべて</option><option value="todo">未作成</option><option value="done">作成済み</option></select>
-<!-- 新規：並び順の選択 -->
 <select id="sortOrder"><option value="default">標準（データ順）</option><option value="kana">あいうえお順</option></select>
 </div>
 <div class="filters"><button class="btn secondary" id="refresh">データ再読み込み</button><button class="btn secondary" id="wishFilter" aria-pressed="false">☆ ウィッシュのみ表示</button></div>
@@ -100,7 +148,6 @@ $('status').textContent=`データ取得成功：${langUsed==='ja'?'日本語':'
 function renderStats(){const total=armorData.length*VARIANTS.length,done=armorData.reduce((n,a)=>n+VARIANTS.filter(v=>isVariantDone(a,v.id)).length,0);$('total').textContent=total;$('made').textContent=done;$('todo').textContent=Math.max(0,total-done);$('rate').textContent=total?Math.round(done/total*100)+'%':'0%'}
 
 /* --- 【辞書機能】 漢字の防具シリーズ名の正確な読み方を指定 --- */
-/* もしあいうえお順がおかしい漢字装備を見つけたら、ここに「漢字: カタカナ」で書き足すだけで修正できます。 */
 const YOMI_DICT = {
   "合金": "ゴウキン",
   "希望": "キボウ",
@@ -125,7 +172,6 @@ function getGroupYomi(name) {
       break;
     }
   }
-  // ひらがな・カタカナを統一し、比較しやすくする
   return yomi.normalize('NFKC').replace(/[\u3041-\u3096]/g, m => String.fromCharCode(m.charCodeAt(0) + 0x60));
 }
 
@@ -194,7 +240,11 @@ function renderArmor(){
       btn.addEventListener('click', () => {
         const target = document.getElementById('kana-header-' + r);
         if(target) {
-          const y = target.getBoundingClientRect().top + window.scrollY - 90; // タブの下に隠れないようにオフセット
+          // メインタブと五十音タブの合計高さを計算してスクロール位置を微調整
+          const tabNav = document.querySelector('.tab-nav');
+          const tabNavHeight = tabNav ? tabNav.offsetHeight : 54;
+          const indexHeight = kanaIndexContainer.offsetHeight;
+          const y = target.getBoundingClientRect().top + window.scrollY - tabNavHeight - indexHeight - 5;
           window.scrollTo({top: y, behavior: 'smooth'});
         }
       });
