@@ -129,8 +129,109 @@ $('search').addEventListener('input',renderArmor);$('part').addEventListener('ch
 $('wishFilter').addEventListener('click',()=>{wishlistOnly=!wishlistOnly;$('wishFilter').setAttribute('aria-pressed',String(wishlistOnly));$('wishFilter').textContent=wishlistOnly?'★ ウィッシュのみ表示中':'☆ ウィッシュのみ表示';renderArmor()});
 $('materialScope').addEventListener('change',renderMaterials);
 $('export').addEventListener('click',()=>{const data={format:'wilds-armor-checklist-player',version:3,exportedAt:new Date().toISOString(),armorStatus:player.armorStatus,materialsOwned:player.materialsOwned,wishlist:player.wishlist};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='wilds-armor-progress.json';a.click();URL.revokeObjectURL(url)});
+function normalizeImportText(value){
+ return String(value??'').normalize('NFKC').replace(/[ 　\t\r\n]/g,'').replace(/[‐‑‒–—−ー]/g,'-').toLocaleLowerCase();
+}
+function savePreImportBackup(){
+ const data={format:'wilds-armor-checklist-player',version:3,exportedAt:new Date().toISOString(),armorStatus:player.armorStatus,materialsOwned:player.materialsOwned,wishlist:player.wishlist};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='wilds-armor-before-import-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function externalArmorKeyParts(rawKey){
+ const raw=String(rawKey??'');
+ if(/下位|low[\s_-]?rank/i.test(raw))return {skip:true};
+ let variant='';if(/(?:Type1|男性型|男性|male|type_?1)$/i.test(raw))variant='type1';else if(/(?:Type2|女性型|女性|female|type_?2)$/i.test(raw))variant='type2';
+ let part='';const partMap={'頭':'head','胴':'chest','腕':'arms','腰':'waist','脚':'legs','head':'head','chest':'chest','arms':'arms','waist':'waist','legs':'legs'};
+ const tokens=raw.split(/[_|/：:]+/).filter(Boolean);
+ for(const token of tokens){if(partMap[token])part=partMap[token];}
+ let name=raw.replace(/(?:[_|/：:]+)?(?:Type1|Type2|男性型|女性型|男性|女性|male|female|type_?1|type_?2)$/i,'');
+ name=name.replace(/(?:[_|/：:]+)?(?:頭|胴|腕|腰|脚|head|chest|arms|waist|legs)$/i,'');
+ name=name.replace(/[_|/：:]+$/,'');
+ return {name,part,variant,skip:false};
+}
+function findImportedArmor(rawKey){
+ const parsed=externalArmorKeyParts(rawKey);if(parsed.skip)return null;
+ const norm=normalizeImportText(parsed.name);
+ let candidates=armorData.filter(a=>{
+  if(parsed.part&&a.kind!==parsed.part)return false;
+  const names=[a.name,a.armorSet?.name].filter(Boolean).map(normalizeImportText);
+  return names.includes(norm);
+ });
+ if(!candidates.length){
+  // A few exports use the armor-series name plus the individual piece name.
+  candidates=armorData.filter(a=>{
+   if(parsed.part&&a.kind!==parsed.part)return false;
+   const n=normalizeImportText(a.name),s=normalizeImportText(a.armorSet?.name||'');
+   return norm===n+s||norm===s+n||norm.endsWith(n)&&norm.includes(s);
+  });
+ }
+ return candidates.length===1?{armor:candidates[0],variant:parsed.variant||'type1'}:null;
+}
+function convertFlexibleBackup(d){
+ const result={armorStatus:{},materialsOwned:{},wishlist:{}};
+ let mappedArmor=0,skippedArmor=0,mappedMaterials=0,skippedMaterials=0,mappedWishlist=0,skippedWishlist=0;
+ const statuses=d.armorStatus&&typeof d.armorStatus==='object'&&!Array.isArray(d.armorStatus)?d.armorStatus:{};
+ for(const [key,value] of Object.entries(statuses)){
+  if(!value)continue;
+  if(armorData.some(a=>Object.prototype.hasOwnProperty.call(statuses,variantKey(a,'type1'))||Object.prototype.hasOwnProperty.call(statuses,variantKey(a,'type2')))&&key.includes('::')){
+   result.armorStatus[key]=!!value;mappedArmor++;continue;
+  }
+  const found=findImportedArmor(key);
+  if(found){result.armorStatus[variantKey(found.armor,found.variant)]=true;mappedArmor++}else skippedArmor++;
+ }
+ const knownMaterials=new Map();
+ for(const a of armorData)for(const m of armorMaterials(a)){
+  const key=normalizeImportText(m.name);if(!knownMaterials.has(key))knownMaterials.set(key,new Set());knownMaterials.get(key).add(m.id);
+ }
+ const owned=d.materialsOwned&&typeof d.materialsOwned==='object'&&!Array.isArray(d.materialsOwned)?d.materialsOwned:{};
+ for(const [key,value] of Object.entries(owned)){
+  const amount=Number(value);if(!Number.isFinite(amount)||amount<0){skippedMaterials++;continue}
+  if(armorData.some(a=>armorMaterials(a).some(m=>m.id===key))){result.materialsOwned[key]=Math.floor(amount);mappedMaterials++;continue}
+  const ids=knownMaterials.get(normalizeImportText(key));
+  if(ids&&ids.size===1){result.materialsOwned[[...ids][0]]=Math.floor(amount);mappedMaterials++}else skippedMaterials++;
+ }
+ const wish=d.wishlist;
+ if(Array.isArray(wish)){
+  for(const raw of wish){
+   const found=findImportedArmor(raw);
+   if(found){result.wishlist[variantKey(found.armor,found.variant)]=true;mappedWishlist++}
+   else{
+    const norm=normalizeImportText(raw);
+    const matches=armorData.filter(a=>[a.name,a.armorSet?.name].filter(Boolean).some(n=>normalizeImportText(n)===norm));
+    if(matches.length){for(const a of matches)for(const v of VARIANTS)result.wishlist[variantKey(a,v.id)]=true;mappedWishlist++}else skippedWishlist++;
+   }
+  }
+ }else if(wish&&typeof wish==='object'){
+  for(const [key,value] of Object.entries(wish)){if(!value)continue;
+   if(armorData.some(a=>Object.prototype.hasOwnProperty.call(wish,variantKey(a,'type1'))||Object.prototype.hasOwnProperty.call(wish,variantKey(a,'type2')))&&key.includes('::')){result.wishlist[key]=true;mappedWishlist++;continue}
+   const found=findImportedArmor(key);if(found){result.wishlist[variantKey(found.armor,found.variant)]=true;mappedWishlist++}else skippedWishlist++;
+  }
+ }
+ return {result,mappedArmor,skippedArmor,mappedMaterials,skippedMaterials,mappedWishlist,skippedWishlist};
+}
 $('importBtn').addEventListener('click',()=>$('importFile').click());
-$('importFile').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.format!=='wilds-armor-checklist-player'||!d.armorStatus||!d.materialsOwned)throw new Error('このアプリの進捗バックアップではありません');if(!confirm('現在の進捗を、読み込むバックアップの内容で置き換えます。続けますか？'))return;player={armorStatus:d.armorStatus,materialsOwned:d.materialsOwned,wishlist:d.wishlist||{}};savePlayer();renderAll();alert('進捗を復元しました')}catch(err){alert('読み込みできませんでした：'+err.message)}finally{e.target.value=''}});
+$('importFile').addEventListener('change',async e=>{
+ const f=e.target.files?.[0];if(!f)return;
+ try{
+  const d=JSON.parse(await f.text());
+  if(!d||typeof d!=='object'||Array.isArray(d))throw new Error('JSONオブジェクトを読み込んでください');
+  const supported=['armorStatus','materialsOwned','wishlist'].some(k=>d[k]!==undefined);
+  if(!supported)throw new Error('armorStatus・materialsOwned・wishlist のいずれも見つかりません');
+  if(!armorData.length)throw new Error('防具データの読み込み完了後に、もう一度お試しください');
+  const converted=convertFlexibleBackup(d);
+  const count=converted.mappedArmor+converted.mappedMaterials+converted.mappedWishlist;
+  if(!count)throw new Error('対応する項目が見つかりませんでした。JSONの項目名・防具名を確認してください');
+  const summary=`読み込み候補：作成状況 ${converted.mappedArmor} 件（未対応 ${converted.skippedArmor} 件）、素材 ${converted.mappedMaterials} 件（未対応 ${converted.skippedMaterials} 件）、ウィッシュ ${converted.mappedWishlist} 件（未対応 ${converted.skippedWishlist} 件）。\\n\\n現在の進捗に追加・統合します。続けますか？`;
+  if(!confirm(summary))return;
+  savePreImportBackup();
+  player.armorStatus={...player.armorStatus,...converted.result.armorStatus};
+  player.materialsOwned={...player.materialsOwned,...converted.result.materialsOwned};
+  player.wishlist={...player.wishlist,...converted.result.wishlist};
+  savePlayer();renderAll();
+  alert(`取り込み完了！\\n作成状況：${converted.mappedArmor} 件／スキップ ${converted.skippedArmor} 件\\n素材：${converted.mappedMaterials} 件／スキップ ${converted.skippedMaterials} 件\\nウィッシュ：${converted.mappedWishlist} 件／スキップ ${converted.skippedWishlist} 件\\n\\n取り込み前の進捗バックアップもダウンロードしました。`);
+ }catch(err){alert('読み込みできませんでした：'+err.message)}
+ finally{e.target.value=''}
+});
 $('reset').addEventListener('click',()=>{if(confirm('このブラウザに保存された作成状況と素材所持数をすべてリセットします。よろしいですか？')){player={armorStatus:{},materialsOwned:{},wishlist:{}};savePlayer();renderAll()}});
 document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{const tab=btn.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b===btn)));document.querySelectorAll('[data-tab-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.tabPanel===tab))}));
 loadPlayer();loadData();loadMonsterSources();
