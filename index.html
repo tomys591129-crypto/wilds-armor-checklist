@@ -7,7 +7,9 @@
 <title>ワイルズ防具コンプリート</title>
 <style>
 :root{color-scheme:light;--bg:#f3f7f7;--panel:#fff;--ink:#172525;--muted:#617171;--teal:#0f766e;--gold:#f2b90b;--line:#dce6e5;--red:#b42318;--tile-todo:#253333;--tile-done:#fff;--tile-border:#526563}:root[data-theme="dark"]{color-scheme:dark;--bg:#101817;--panel:#1a2523;--ink:#edf6f4;--muted:#a5b8b4;--teal:#22a99b;--gold:#f2c94c;--line:#344441;--tile-todo:#0b1110;--tile-done:#263d38;--tile-border:#526563}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;transition:background .2s,color .2s}header{background:#123b3a;color:#fff;padding:18px 16px;position:relative}header .theme-toggle{position:absolute;right:14px;top:14px;border:1px solid #72928e;border-radius:999px;padding:7px 10px;background:#214b48;color:#fff;font:inherit;font-size:.8rem;font-weight:700}header h1{font-size:1.25rem;margin:0 0 6px}header p{margin:0;color:#d7eeeb;font-size:.88rem}main{max-width:1050px;margin:auto;padding:14px;display:grid;gap:14px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 2px 7px #183a3a0a}.panel h2{font-size:1.03rem;margin:0 0 12px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.stat{background:#edf7f5;border-radius:10px;padding:9px 6px}:root[data-theme="dark"] .stat{background:#233a36}.stat b{display:block;font-size:1.15rem;color:var(--teal)}.stat span{font-size:.7rem;color:var(--muted)}.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.controls input,.controls select,.material-row input{width:100%;padding:10px;border:1px solid #cbd8d7;border-radius:9px;background:white;color:var(--ink);font:inherit}.filters{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.btn{border:0;border-radius:9px;padding:10px 12px;background:var(--teal);color:white;font:inherit;font-weight:650;cursor:pointer}.btn.secondary{background:#e8f2f1;color:#174a47}.btn.warn{background:#fff0ed;color:var(--red)}.armor-list{display:grid;gap:14px}.armor-series{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--panel)}.series-title{padding:9px 11px;background:#e6f1ef;color:#174a47;font-weight:800;font-size:.9rem;border-bottom:1px solid var(--line)}:root[data-theme="dark"] .series-title{background:#233a36;color:#b6eee5}.series-variant{padding:7px 6px 9px;border-bottom:1px solid var(--line)}.series-variant:last-child{border-bottom:0}.variant-label{font-size:.82rem;font-weight:800;color:var(--ink);margin:0 0 6px 2px}.series-parts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;padding:0}.part-button{position:relative;min-width:0;min-height:76px;border:2px solid #526563;border-radius:10px;padding:8px 1px 6px;background:var(--tile-todo);color:#eaf2f0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;cursor:pointer;transition:background .18s,color .18s,border-color .18s,transform .08s}.part-button:active{transform:scale(.97)}.part-button.is-done{background:var(--tile-done);border-color:#a8c8c0;color:var(--ink);box-shadow:0 2px 7px #183a3a0a}.part-icon{width:42px;height:42px;display:block;color:#9eaaa5;opacity:.62;filter:grayscale(1);transition:color .18s,opacity .18s,filter .18s}.part-icon svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}.part-button.is-done .part-icon{color:#d8b86a;filter:none;opacity:1}:root[data-theme="dark"] .part-button.is-done .part-icon{color:#f0cd79}.part-wish{position:absolute;right:3px;top:2px;border:0;background:transparent;color:#f2c94c;font-size:.95rem;line-height:1;padding:2px;cursor:pointer}.part-button:focus-visible,.part-wish:focus-visible{outline:3px solid var(--gold);outline-offset:2px}.materials{display:none}.meta{font-size:.78rem;color:var(--muted);line-height:1.55}.armor-toggle{border:1px solid #81918f;border-radius:7px;padding:6px 1px;width:100%;background:#394747;color:#fff;font:inherit;font-size:.62rem;line-height:1.2;font-weight:700;cursor:pointer;align-self:center}.variant-cell{min-width:0;padding:3px 1px;border-radius:6px;background:var(--tile-todo);color:#eaf2f0}.variant-cell.is-done{background:var(--tile-done);color:var(--ink)}.armor.is-done .armor-toggle{background:#0f766e;border-color:#0f766e;color:#fff}.armor-actions{display:flex;flex-direction:column;gap:4px;align-items:stretch;width:100%}.wish-toggle{border:1px solid #a68b38;border-radius:7px;padding:5px 1px;width:100%;background:#3d3a2d;color:#ffe18a;font:inherit;font-size:.62rem;font-weight:700;cursor:pointer}.armor.is-done .wish-toggle{background:#fff8dc;color:#715700;border-color:#e2c65c}.wish-toggle[aria-pressed="true"]{background:#f2b90b;border-color:#f2b90b;color:#2b260f}.armor.is-done .wish-toggle[aria-pressed="true"]{background:#f2b90b;color:#2b260f}.material-list{display:grid;gap:8px}.material-row{display:grid;grid-template-columns:minmax(0,1fr) 76px 78px;gap:8px;align-items:center;border-bottom:1px solid #edf1f1;padding:9px 0}.material-source{grid-column:1/-1;font-size:.78rem;color:var(--muted);line-height:1.55}.material-source summary{display:inline-block;cursor:pointer;color:var(--teal);font-weight:650;padding:3px 0}.source-line{padding:4px 0;border-top:1px solid #edf1f1}.source-label{font-weight:650;color:var(--ink)}.material-row:last-child{border:0}.material-name{font-size:.88rem}.material-sub{display:block;color:var(--muted);font-size:.73rem}.qty{font-size:.8rem;color:var(--muted);text-align:right}.notice{font-size:.82rem;color:var(--muted);line-height:1.6}.error{color:var(--red)}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.loading{padding:20px;text-align:center;color:var(--muted)}footer{max-width:1050px;margin:auto;padding:0 16px 22px;color:var(--muted);font-size:.75rem;line-height:1.5}@media(min-width:760px){main{grid-template-columns:1.15fr .85fr}.wide{grid-column:1/-1}.controls{grid-template-columns:2fr 1fr 1fr}.armor-list{grid-template-columns:1fr}}@media(max-width:380px){.series-variant{padding:6px 4px 8px}.series-parts{gap:4px}.part-button{min-height:68px;border-radius:8px}.part-icon{width:36px;height:36px}.part-wish{font-size:.82rem;right:1px;top:1px}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;transition:background .2s,color .2s}header{background:#123b3a;color:#fff;padding:18px 16px;position:relative}header .theme-toggle{position:absolute;right:14px;top:14px;border:1px solid #72928e;border-radius:999px;padding:7px 10px;background:#214b48;color:#fff;font:inherit;font-size:.8rem;font-weight:700}header h1{font-size:1.25rem;margin:0 0 6px}header p{margin:0;color:#d7eeeb;font-size:.88rem}main{max-width:1050px;margin:auto;padding:14px;display:grid;gap:14px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 2px 7px #183a3a0a}.panel h2{font-size:1.03rem;margin:0 0 12px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.stat{background:#edf7f5;border-radius:10px;padding:9px 6px}:root[data-theme="dark"] .stat{background:#233a36}.stat b{display:block;font-size:1.15rem;color:var(--teal)}.stat span{font-size:.7rem;color:var(--muted)}.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.controls input,.controls select,.material-row input{width:100%;padding:10px;border:1px solid #cbd8d7;border-radius:9px;background:white;color:var(--ink);font:inherit}.filters{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.btn{border:0;border-radius:9px;padding:10px 12px;background:var(--teal);color:white;font:inherit;font-weight:650;cursor:pointer}.btn.secondary{background:#e8f2f1;color:#174a47}.btn.warn{background:#fff0ed;color:var(--red)}.armor-list{display:grid;gap:14px}.armor-series{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--panel)}.series-title{padding:9px 11px;background:#e6f1ef;color:#174a47;font-weight:800;font-size:.9rem;border-bottom:1px solid var(--line)}:root[data-theme="dark"] .series-title{background:#233a36;color:#b6eee5}.series-variant{padding:7px 6px 9px;border-bottom:1px solid var(--line)}.series-variant:last-child{border-bottom:0}.variant-label{font-size:.82rem;font-weight:800;color:var(--ink);margin:0 0 6px 2px}.series-parts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;padding:0}.part-button{position:relative;min-width:0;min-height:76px;border:2px solid #526563;border-radius:10px;padding:8px 1px 6px;background:var(--tile-todo);color:#eaf2f0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;cursor:pointer;transition:background .18s,color .18s,border-color .18s,transform .08s}.part-button:active{transform:scale(.97)}.part-button.is-done{background:var(--tile-done);border-color:#a8c8c0;color:var(--ink);box-shadow:0 2px 7px #183a3a0a}.part-icon{width:42px;height:42px;display:block;color:#9eaaa5;opacity:.62;filter:grayscale(1);transition:color .18s,opacity .18s,filter .18s}.part-icon svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}.part-button.is-done .part-icon{color:#d8b86a;filter:none;opacity:1}:root[data-theme="dark"] .part-button.is-done .part-icon{color:#f0cd79}.part-wish{position:absolute;right:3px;top:2px;border:0;background:transparent;color:#f2c94c;font-size:.95rem;line-height:1;padding:2px;cursor:pointer}.part-button:focus-visible,.part-wish:focus-visible{outline:3px solid var(--gold);outline-offset:2px}.materials{display:none}.meta{font-size:.78rem;color:var(--muted);line-height:1.55}.armor-toggle{border:1px solid #81918f;border-radius:7px;padding:6px 1px;width:100%;background:#394747;color:#fff;font:inherit;font-size:.62rem;line-height:1.2;font-weight:700;cursor:pointer;align-self:center}.variant-cell{min-width:0;padding:3px 1px;border-radius:6px;background:var(--tile-todo);color:#eaf2f0}.variant-cell.is-done{background:var(--tile-done);color:var(--ink)}.armor.is-done .armor-toggle{background:#0f766e;border-color:#0f766e;color:#fff}.armor-actions{display:flex;flex-direction:column;gap:4px;align-items:stretch;width:100%}.wish-toggle{border:1px solid #a68b38;border-radius:7px;padding:5px 1px;width:100%;background:#3d3a2d;color:#ffe18a;font:inherit;font-size:.62rem;font-weight:700;cursor:pointer}.armor.is-done .wish-toggle{background:#fff8dc;color:#715700;border-color:#e2c65c}.wish-toggle[aria-pressed="true"]{background:#f2b90b;border-color:#f2b90b;color:#2b260f}.armor.is-done .wish-toggle[aria-pressed="true"]{background:#f2b90b;color:#2b260f}.material-list{display:grid;gap:8px}.material-row{display:grid;grid-template-columns:minmax(0,1fr) 76px 78px;gap:8px;align-items:center;border-bottom:1px solid #edf1f1;padding:9px 0}.material-source{grid-column:1/-1;font-size:.78rem;color:var(--muted);line-height:1.55}.material-source summary{display:inline-block;cursor:pointer;color:var(--teal);font-weight:650;padding:3px 0}.source-line{padding:4px 0;border-top:1px solid #edf1f1}.source-label{font-weight:650;color:var(--ink)}.material-row:last-child{border:0}.material-name{font-size:.88rem}.material-sub{display:block;color:var(--muted);font-size:.73rem}.qty{font-size:.8rem;color:var(--muted);text-align:right}.notice{font-size:.82rem;color:var(--muted);line-height:1.6}.error{color:var(--red)}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.loading{padding:20px;text-align:center;color:var(--muted)}footer{max-width:1050px;margin:auto;padding:0 16px 22px;color:var(--muted);font-size:.75rem;line-height:1.5}
+@media(min-width:760px){main{grid-template-columns:1.15fr .85fr}.wide{grid-column:1/-1}.controls{grid-template-columns:2fr 1fr 1fr 1fr}.armor-list{grid-template-columns:1fr}}
+@media(max-width:380px){.series-variant{padding:6px 4px 8px}.series-parts{gap:4px}.part-button{min-height:68px;border-radius:8px}.part-icon{width:36px;height:36px}.part-wish{font-size:.82rem;right:1px;top:1px}}
 .tab-nav{position:sticky;top:0;z-index:100;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 2px;padding:8px 0;background:var(--bg);box-shadow:0 5px 10px #102a2818;}.tab-btn{border:1px solid #cbd8d7;border-radius:10px;padding:11px 6px;background:#e8f2f1;color:#174a47;font:inherit;font-size:.88rem;font-weight:700;cursor:pointer}.tab-btn[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}.tab-panel{display:none;grid-column:1/-1}.tab-panel.active{display:block}@media(min-width:760px){.tab-nav{grid-column:1/-1}}
 :root[data-theme="dark"] .controls input,
 :root[data-theme="dark"] .controls select,
@@ -27,6 +29,14 @@
 :root[data-theme="dark"] .part-button.is-done{background:#263d38;color:#edf6f4;border-color:#668d81}
 :root[data-theme="dark"] .part-button:not(.is-done){background:#0b1110;color:#eaf2f0;border-color:#526563}
 :root[data-theme="dark"] .part-wish{background:transparent;color:#f2c94c}
+/* 五十音インデックス用スタイル */
+.kana-index{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0 4px}
+.kana-btn{flex:1;min-width:32px;padding:8px 4px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer;font-weight:700;font-size:0.9rem;text-align:center}
+.kana-btn:hover,.kana-btn:active{background:var(--teal);color:#fff;border-color:var(--teal)}
+:root[data-theme="dark"] .kana-btn{background:#263a36;color:#e5f5f1;border-color:#49635d}
+:root[data-theme="dark"] .kana-btn:hover,:root[data-theme="dark"] .kana-btn:active{background:var(--teal);color:#fff}
+.kana-header{padding:6px 12px;margin:20px 0 10px;background:var(--teal);color:#fff;border-radius:6px;font-weight:800;position:sticky;top:56px;z-index:10;box-shadow:0 2px 5px #00000020}
+:root[data-theme="dark"] .kana-header{background:#22a99b;color:#101817}
 </style>
 </head>
 <body>
@@ -39,8 +49,15 @@
 <nav class="tab-nav wide" role="tablist" aria-label="管理画面"><button type="button" class="tab-btn" role="tab" id="tab-armor" aria-controls="panel-armor" aria-selected="true" data-tab="armor">防具一覧</button><button type="button" class="tab-btn" role="tab" id="tab-materials" aria-controls="panel-materials" aria-selected="false" data-tab="materials">素材管理</button><button type="button" class="tab-btn" role="tab" id="tab-backup" aria-controls="panel-backup" aria-selected="false" data-tab="backup">バックアップ</button></nav>
 <section class="panel tab-panel active" id="panel-armor" data-tab-panel="armor">
 <h2>防具一覧</h2>
-<div class="controls"><input id="search" placeholder="シリーズ名で検索（防具名も検索対象）"><select id="part"><option value="">全部位</option><option value="head">頭</option><option value="chest">胴</option><option value="arms">腕</option><option value="waist">腰</option><option value="legs">脚</option></select><select id="state"><option value="all">すべて</option><option value="todo">未作成</option><option value="done">作成済み</option></select></div>
+<div class="controls"><input id="search" placeholder="シリーズ名で検索（防具名も検索対象）">
+<select id="part"><option value="">全部位</option><option value="head">頭</option><option value="chest">胴</option><option value="arms">腕</option><option value="waist">腰</option><option value="legs">脚</option></select>
+<select id="state"><option value="all">すべて</option><option value="todo">未作成</option><option value="done">作成済み</option></select>
+<!-- 新規：並び順の選択 -->
+<select id="sortOrder"><option value="default">標準（データ順）</option><option value="kana">あいうえお順</option></select>
+</div>
 <div class="filters"><button class="btn secondary" id="refresh">データ再読み込み</button><button class="btn secondary" id="wishFilter" aria-pressed="false">☆ ウィッシュのみ表示</button></div>
+<!-- 五十音ジャンプボタン表示枠 -->
+<div id="kanaIndex" class="kana-index" style="display:none"></div>
 <div id="armorList" class="armor-list" style="margin-top:12px"><div class="loading">読み込み中…</div></div>
 </section>
 <section class="panel tab-panel" id="panel-materials" data-tab-panel="materials">
@@ -81,14 +98,62 @@ if(!data){$('status').innerHTML='<span class="error">防具データを取得で
 armorData=data.filter(a=>a.rank==='high'&&PARTS[a.kind]).sort((a,b)=>(PARTS[a.kind]||'').localeCompare(PARTS[b.kind]||'','ja')||String(a.name).localeCompare(String(b.name),'ja'));
 $('status').textContent=`データ取得成功：${langUsed==='ja'?'日本語':'英語'}データ。上位防具 ${armorData.length} 点（見た目2タイプで計 ${armorData.length*2} 種）を読み込みました。`;renderAll()}
 function renderStats(){const total=armorData.length*VARIANTS.length,done=armorData.reduce((n,a)=>n+VARIANTS.filter(v=>isVariantDone(a,v.id)).length,0);$('total').textContent=total;$('made').textContent=done;$('todo').textContent=Math.max(0,total-done);$('rate').textContent=total?Math.round(done/total*100)+'%':'0%'}
+
+/* --- 【辞書機能】 漢字の防具シリーズ名の正確な読み方を指定 --- */
+/* もしあいうえお順がおかしい漢字装備を見つけたら、ここに「漢字: カタカナ」で書き足すだけで修正できます。 */
+const YOMI_DICT = {
+  "合金": "ゴウキン",
+  "希望": "キボウ",
+  "暁": "アカツキ",
+  "骨": "ホネ",
+  "狩人": "カリウド",
+  "凶星": "キョウセイ",
+  "赫耀": "カクヨウ",
+  "禍鎧": "マガガイ",
+  "金色": "コンジキ",
+  "斉天": "セイテン",
+  "怒天": "ドテン",
+  "雪見": "ユキミ",
+  "海境": "カイキョウ"
+};
+
+function getGroupYomi(name) {
+  let yomi = name;
+  for (const [kanji, kana] of Object.entries(YOMI_DICT)) {
+    if (name.includes(kanji)) {
+      yomi = name.replace(kanji, kana);
+      break;
+    }
+  }
+  // ひらがな・カタカナを統一し、比較しやすくする
+  return yomi.normalize('NFKC').replace(/[\u3041-\u3096]/g, m => String.fromCharCode(m.charCodeAt(0) + 0x60));
+}
+
+function getKanaRow(yomi) {
+  const c = yomi.charAt(0);
+  if(c >= 'ア' && c <= 'オ' || c === 'ヴ') return 'あ';
+  if(c >= 'カ' && c <= 'ゴ') return 'か';
+  if(c >= 'サ' && c <= 'ゾ') return 'さ';
+  if(c >= 'タ' && c <= 'ド') return 'た';
+  if(c >= 'ナ' && c <= 'ノ') return 'な';
+  if(c >= 'ハ' && c <= 'ポ') return 'は';
+  if(c >= 'マ' && c <= 'モ') return 'ま';
+  if(c >= 'ヤ' && c <= 'ヨ') return 'や';
+  if(c >= 'ラ' && c <= 'ロ') return 'ら';
+  if(c >= 'ワ' && c <= 'ン') return 'わ';
+  return 'その他';
+}
+
 function renderArmor(){
   const q=$('search').value.trim().toLocaleLowerCase(),part=$('part').value,state=$('state').value;
+  const sortOrder=$('sortOrder').value;
+  
   const filtered=armorData.filter(a=>{
     const matches=(v)=>state==='all'||(state==='done'?isVariantDone(a,v.id):!isVariantDone(a,v.id));
     return (!part||a.kind===part)&&(!q||[a.name,a.armorSet?.name].filter(Boolean).some(s=>s.toLocaleLowerCase().includes(q)))&&VARIANTS.some(matches)&&(!wishlistOnly||VARIANTS.some(v=>isVariantWishlisted(a,v.id)))
   });
   $('armorList').innerHTML='';
-  if(!filtered.length){$('armorList').innerHTML='<div class="loading">条件に合う防具がありません。</div>';return}
+  if(!filtered.length){$('armorList').innerHTML='<div class="loading">条件に合う防具がありません。</div>';$('kanaIndex').style.display='none';return}
   
   const groups=new Map();
   for(const a of filtered){
@@ -107,6 +172,38 @@ function renderArmor(){
     }
   }
   
+  let sortedGroups = [...groups.entries()];
+  if(sortOrder === 'kana') {
+    sortedGroups.sort((a,b) => {
+      const yomiA = getGroupYomi(a[0]);
+      const yomiB = getGroupYomi(b[0]);
+      return yomiA.localeCompare(yomiB, 'ja');
+    });
+  }
+  
+  const kanaIndexContainer = $('kanaIndex');
+  kanaIndexContainer.innerHTML = '';
+  if (sortOrder === 'kana') {
+    kanaIndexContainer.style.display = 'flex';
+    const rows = ['あ','か','さ','た','な','は','ま','や','ら','わ','その他'];
+    for(const r of rows) {
+      const btn = document.createElement('button');
+      btn.className = 'kana-btn';
+      btn.textContent = r;
+      btn.type = 'button';
+      btn.addEventListener('click', () => {
+        const target = document.getElementById('kana-header-' + r);
+        if(target) {
+          const y = target.getBoundingClientRect().top + window.scrollY - 90; // タブの下に隠れないようにオフセット
+          window.scrollTo({top: y, behavior: 'smooth'});
+        }
+      });
+      kanaIndexContainer.append(btn);
+    }
+  } else {
+    kanaIndexContainer.style.display = 'none';
+  }
+  
   const partOrder=['head','chest','arms','waist','legs'],partNames={head:'頭',chest:'胴',arms:'腕',waist:'腰',legs:'脚'},icons={
   head:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 29c-2-12 5-21 14-21s16 9 14 21l4 5-7 3H13l-7-3z"/><path d="M14 21l6-7 4 4 4-4 6 7M12 28h24M18 29l-2 7m14-7 2 7M20 36v4m8-4v4"/><path d="M6 34l7 3 11 2 11-2 7-3"/></svg>',
   chest:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 7l7 4 7-4 9 7-5 11-4-3 2 18H15l2-18-4 3-5-11z"/><path d="M17 7l-2 10 9 6 9-6-2-10M24 11v26M16 25l8 3 8-3M19 17l5 6 5-6"/><path d="M12 17l4 5m20-5-4 5"/></svg>',
@@ -114,7 +211,21 @@ function renderArmor(){
   waist:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 9l12 3 12-3 3 13-7 5-2 13H18l-2-13-7-5z"/><path d="M12 9l2 11 10 4 10-4 2-11M24 12v12M18 27l6 2 6-2M19 40l-1-5m11 5 1-5"/><path d="M21 16h6v5h-6z"/></svg>',
   legs:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 7h11l1 15-3 18H9l2-17zM25 7h11l1 16 2 17H27l-3-18z"/><path d="M12 7l2 10 8 3m14-13-2 10-8 3M10 30l11 2m5-2 11 2M9 40h12m6 0h12M17 12l2 4m12-4-2 4"/></svg>'};
   
-  for(const [series,items] of groups){
+  let currentKanaRow = '';
+  
+  for(const [series,items] of sortedGroups){
+    if (sortOrder === 'kana') {
+      const row = getKanaRow(getGroupYomi(series));
+      if (row !== currentKanaRow) {
+        currentKanaRow = row;
+        const header = document.createElement('div');
+        header.className = 'kana-header';
+        header.id = 'kana-header-' + row;
+        header.textContent = row + '行';
+        $('armorList').append(header);
+      }
+    }
+    
     items.sort((a,b)=>partOrder.indexOf(a.kind)-partOrder.indexOf(b.kind)||a.name.localeCompare(b.name,'ja'));
     const wrap=document.createElement('section');wrap.className='armor-series';
     const title=document.createElement('div');title.className='series-title';title.textContent=series;wrap.append(title);
@@ -253,7 +364,11 @@ function renderMaterials(){
 }
 
 function renderAll(){renderStats();renderArmor();renderMaterials()}
-$('search').addEventListener('input',renderArmor);$('part').addEventListener('change',renderArmor);$('state').addEventListener('change',renderArmor);$('refresh').addEventListener('click',loadData);
+$('search').addEventListener('input',renderArmor);
+$('part').addEventListener('change',renderArmor);
+$('state').addEventListener('change',renderArmor);
+$('sortOrder').addEventListener('change',renderArmor);
+$('refresh').addEventListener('click',loadData);
 $('wishFilter').addEventListener('click',()=>{wishlistOnly=!wishlistOnly;$('wishFilter').setAttribute('aria-pressed',String(wishlistOnly));$('wishFilter').textContent=wishlistOnly?'★ ウィッシュのみ表示中':'☆ ウィッシュのみ表示';renderArmor()});
 $('materialScope').addEventListener('change',renderMaterials);
 $('export').addEventListener('click',()=>{const data={format:'wilds-armor-checklist-player',version:3,exportedAt:new Date().toISOString(),armorStatus:player.armorStatus,materialsOwned:player.materialsOwned,wishlist:player.wishlist};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='wilds-armor-progress.json';a.click();URL.revokeObjectURL(url)});
