@@ -198,20 +198,29 @@ function renderArmor(){
   }
   
   let sortedGroups = [...groups.entries()];
+  let activeRowSet = new Set();
+  
   if(sortOrder === 'kana') {
     sortedGroups.sort((a,b) => {
       const yomiA = getGroupYomi(a[0]);
       const yomiB = getGroupYomi(b[0]);
       return yomiA.localeCompare(yomiB, 'ja');
     });
+    // 現在のリストに存在する「行」だけを抽出
+    for(const [series] of sortedGroups) {
+      activeRowSet.add(getKanaRow(getGroupYomi(series)));
+    }
   }
   
   const kanaIndexContainer = $('kanaIndex');
   kanaIndexContainer.innerHTML = '';
   if (sortOrder === 'kana') {
     kanaIndexContainer.style.display = 'flex';
-    const rows = ['あ','か','さ','た','な','は','ま','や','ら','わ','その他'];
-    for(const r of rows) {
+    const ALL_ROWS = ['あ','か','さ','た','な','は','ま','や','ら','わ','その他'];
+    // データが存在する行のボタンだけを生成する
+    const activeRows = ALL_ROWS.filter(r => activeRowSet.has(r));
+    
+    for(const r of activeRows) {
       const btn = document.createElement('button');
       btn.className = 'kana-btn';
       btn.textContent = r;
@@ -257,7 +266,6 @@ function renderArmor(){
     items.sort((a,b)=>partOrder.indexOf(a.kind)-partOrder.indexOf(b.kind)||a.name.localeCompare(b.name,'ja'));
     const wrap=document.createElement('section');wrap.className='armor-series';
     
-    // 【新機能】シリーズ全10部位を一括登録・解除するボタン
     const isAllSeriesDone = items.every(a => VARIANTS.every(v => isVariantDone(a, v.id)));
     const title=document.createElement('button');
     title.type='button';
@@ -274,7 +282,6 @@ function renderArmor(){
     for(const v of VARIANTS){
       const row=document.createElement('div');row.className='series-variant';
       
-      // 【新機能】男性型・女性型の5部位を一括登録・解除するボタン
       const isAllVariantDone = items.every(a => isVariantDone(a, v.id));
       const label=document.createElement('button');
       label.type='button';
@@ -556,7 +563,4 @@ $('importFile').addEventListener('change',async e=>{
  }
 });
 $('reset').addEventListener('click',()=>{if(confirm('このブラウザに保存された作成状況と素材所持数をすべてリセットします。よろしいですか？')){player={armorStatus:{},materialsOwned:{},wishlist:{}};savePlayer();renderAll()}});
-document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{const tab=btn.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b===btn)));document.querySelectorAll('[data-tab-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.tabPanel===tab))}));
-loadPlayer();loadData();loadMonsterSources();
-</script>
-</body></html>
+document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{const tab=btn.dataset.tab;docume
