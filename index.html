@@ -563,4 +563,7 @@ $('importFile').addEventListener('change',async e=>{
  }
 });
 $('reset').addEventListener('click',()=>{if(confirm('このブラウザに保存された作成状況と素材所持数をすべてリセットします。よろしいですか？')){player={armorStatus:{},materialsOwned:{},wishlist:{}};savePlayer();renderAll()}});
-document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{const tab=btn.dataset.tab;docume
+document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{const tab=btn.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b===btn)));document.querySelectorAll('[data-tab-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.tabPanel===tab))}));
+loadPlayer();loadData();loadMonsterSources();
+</script>
+</body></html>
