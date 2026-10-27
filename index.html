@@ -30,62 +30,23 @@
 :root[data-theme="dark"] .part-button:not(.is-done){background:#0b1110;color:#eaf2f0;border-color:#526563}
 :root[data-theme="dark"] .part-wish{background:transparent;color:#f2c94c}
 /* 五十音インデックス用スタイル（固定表示対応） */
-.kana-index {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  position: sticky;
-  top: 50px; /* タブナビゲーションの真下付近に固定 */
-  z-index: 90;
-  background: var(--panel);
-  padding: 10px 14px;
-  margin: 10px -14px 15px -14px;
-  border-bottom: 1px solid var(--line);
-  box-shadow: 0 4px 8px #00000008;
-}
-:root[data-theme="dark"] .kana-index {
-  box-shadow: 0 4px 8px #00000020;
-}
-.kana-btn {
-  flex: 1;
-  min-width: 32px;
-  padding: 8px 4px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--bg);
-  color: var(--ink);
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 0.9rem;
-  text-align: center;
-}
-.kana-btn:hover, .kana-btn:active {
-  background: var(--teal);
-  color: #fff;
-  border-color: var(--teal);
-}
-:root[data-theme="dark"] .kana-btn {
-  background: #263a36;
-  color: #e5f5f1;
-  border-color: #49635d;
-}
-:root[data-theme="dark"] .kana-btn:hover, :root[data-theme="dark"] .kana-btn:active {
-  background: var(--teal);
-  color: #fff;
-}
-/* 行の見出しの固定を解除し、通常表示にする */
-.kana-header {
-  padding: 6px 12px;
-  margin: 20px 0 10px;
-  background: var(--teal);
-  color: #fff;
-  border-radius: 6px;
-  font-weight: 800;
-}
-:root[data-theme="dark"] .kana-header {
-  background: #22a99b;
-  color: #101817;
-}
+.kana-index { display: flex; flex-wrap: wrap; gap: 5px; position: sticky; top: 50px; z-index: 90; background: var(--panel); padding: 10px 14px; margin: 10px -14px 15px -14px; border-bottom: 1px solid var(--line); box-shadow: 0 4px 8px #00000008; }
+:root[data-theme="dark"] .kana-index { box-shadow: 0 4px 8px #00000020; }
+.kana-btn { flex: 1; min-width: 32px; padding: 8px 4px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); cursor: pointer; font-weight: 700; font-size: 0.9rem; text-align: center; }
+.kana-btn:hover, .kana-btn:active { background: var(--teal); color: #fff; border-color: var(--teal); }
+:root[data-theme="dark"] .kana-btn { background: #263a36; color: #e5f5f1; border-color: #49635d; }
+:root[data-theme="dark"] .kana-btn:hover, :root[data-theme="dark"] .kana-btn:active { background: var(--teal); color: #fff; }
+.kana-header { padding: 6px 12px; margin: 20px 0 10px; background: var(--teal); color: #fff; border-radius: 6px; font-weight: 800; }
+:root[data-theme="dark"] .kana-header { background: #22a99b; color: #101817; }
+/* 一括登録・解除ボタンのスタイル */
+button.series-title, button.variant-label { display: flex; justify-content: space-between; align-items: center; width: 100%; border: none; font-family: inherit; text-align: left; cursor: pointer; outline-offset: -2px; }
+button.series-title { border-bottom: 1px solid var(--line); }
+button.series-title:active { background: #d4e5e2; }
+:root[data-theme="dark"] button.series-title:active { background: #1c2e2b; }
+button.variant-label { background: transparent; padding: 0 0 6px 2px; margin: 0 0 4px 0; }
+button.variant-label:active { opacity: 0.6; }
+.toggle-hint { font-size: 0.68rem; font-weight: 700; background: #0f766e20; color: var(--teal); padding: 3px 6px; border-radius: 4px; letter-spacing: 0.5px; }
+:root[data-theme="dark"] .toggle-hint { background: #22a99b25; color: #22a99b; }
 </style>
 </head>
 <body>
@@ -104,7 +65,6 @@
 <select id="sortOrder"><option value="default">標準（データ順）</option><option value="kana">あいうえお順</option></select>
 </div>
 <div class="filters"><button class="btn secondary" id="refresh">データ再読み込み</button><button class="btn secondary" id="wishFilter" aria-pressed="false">☆ ウィッシュのみ表示</button></div>
-<!-- 五十音ジャンプボタン表示枠 -->
 <div id="kanaIndex" class="kana-index" style="display:none"></div>
 <div id="armorList" class="armor-list" style="margin-top:12px"><div class="loading">読み込み中…</div></div>
 </section>
@@ -149,19 +109,38 @@ function renderStats(){const total=armorData.length*VARIANTS.length,done=armorDa
 
 /* --- 【辞書機能】 漢字の防具シリーズ名の正確な読み方を指定 --- */
 const YOMI_DICT = {
-  "合金": "ゴウキン",
-  "希望": "キボウ",
+  "護鎖刃竜": "ゴサジンリュウ",
+  "護兇爪竜": "ゴキョウソウリュウ",
+  "護竜セクレト": "ゴリュウセクレト",
+  "護雷顎竜": "ゴライガクリュウ",
+  "護火竜": "ゴカリュウ",
+  "護闢獣": "ゴビャクジュウ",
+  "竜王の隻眼": "リュウオウノセキガン",
+  "無垢ナル龍": "ムクナルリュウ",
+  "蒼世ノ侍": "アオヨノサムライ",
+  "祝福の腰飾り": "シュクフクノコシカザリ",
+  "調査隊の耳飾り": "チョウサタイノミミカザリ",
+  "封印の眼帯": "フウインノガンタイ",
+  "封印の龍骸布": "フウインノリュウガイフ",
+  "献身のピアス": "ケンシンノピアス",
+  "健啖家の耳飾り": "ケンタンカノミミカザリ",
+  "知略の眼鏡": "チリャクノメガネ",
+  "一枚羽の首飾り": "イチマイバネノクビカザリ",
+  "竜人族の耳飾り": "リュウジンゾクノミミカザリ",
+  "桜波": "オウハ",
   "暁": "アカツキ",
-  "骨": "ホネ",
-  "狩人": "カリウド",
-  "凶星": "キョウセイ",
+  "海境": "カイキョウ",
   "赫耀": "カクヨウ",
-  "禍鎧": "マガガイ",
+  "狩人": "カリウド",
+  "希望": "キボウ",
+  "凶星": "キョウセイ",
   "金色": "コンジキ",
   "斉天": "セイテン",
   "怒天": "ドテン",
   "雪見": "ユキミ",
-  "海境": "カイキョウ"
+  "禍鎧": "マガガイ",
+  "骨": "ホネ",
+  "合金": "ゴウキン"
 };
 
 function getGroupYomi(name) {
@@ -240,7 +219,6 @@ function renderArmor(){
       btn.addEventListener('click', () => {
         const target = document.getElementById('kana-header-' + r);
         if(target) {
-          // メインタブと五十音タブの合計高さを計算してスクロール位置を微調整
           const tabNav = document.querySelector('.tab-nav');
           const tabNavHeight = tabNav ? tabNav.offsetHeight : 54;
           const indexHeight = kanaIndexContainer.offsetHeight;
@@ -278,10 +256,38 @@ function renderArmor(){
     
     items.sort((a,b)=>partOrder.indexOf(a.kind)-partOrder.indexOf(b.kind)||a.name.localeCompare(b.name,'ja'));
     const wrap=document.createElement('section');wrap.className='armor-series';
-    const title=document.createElement('div');title.className='series-title';title.textContent=series;wrap.append(title);
+    
+    // 【新機能】シリーズ全10部位を一括登録・解除するボタン
+    const isAllSeriesDone = items.every(a => VARIANTS.every(v => isVariantDone(a, v.id)));
+    const title=document.createElement('button');
+    title.type='button';
+    title.className='series-title';
+    title.title='このシリーズをすべて一括切替';
+    title.innerHTML=`<span>${series}</span><span class="toggle-hint">${isAllSeriesDone ? '一括解除' : '一括登録'}</span>`;
+    title.addEventListener('click', () => {
+      items.forEach(a => { VARIANTS.forEach(v => { player.armorStatus[variantKey(a, v.id)] = !isAllSeriesDone; }); });
+      savePlayer();
+      renderAll();
+    });
+    wrap.append(title);
+    
     for(const v of VARIANTS){
       const row=document.createElement('div');row.className='series-variant';
-      const label=document.createElement('div');label.className='variant-label';label.textContent=v.label;row.append(label);
+      
+      // 【新機能】男性型・女性型の5部位を一括登録・解除するボタン
+      const isAllVariantDone = items.every(a => isVariantDone(a, v.id));
+      const label=document.createElement('button');
+      label.type='button';
+      label.className='variant-label';
+      label.title=`${v.label}をすべて一括切替`;
+      label.innerHTML=`<span>${v.label}</span><span class="toggle-hint">${isAllVariantDone ? '一括解除' : '一括登録'}</span>`;
+      label.addEventListener('click', () => {
+        items.forEach(a => { player.armorStatus[variantKey(a, v.id)] = !isAllVariantDone; });
+        savePlayer();
+        renderAll();
+      });
+      row.append(label);
+      
       const parts=document.createElement('div');parts.className='series-parts';
       for(const kind of partOrder){
         const a=items.find(x=>x.kind===kind);
