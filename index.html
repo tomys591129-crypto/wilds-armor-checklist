@@ -233,7 +233,25 @@ function getGroupYomi(name) {
     }
   }
   return yomi.normalize('NFKC').replace(/[\u3041-\u3096]/g, m => String.fromCharCode(m.charCodeAt(0) + 0x60));
-}
+/* 検索用：ひらがな・カタカナ・漢字の読みを統一 */
+function normalizeSearchText(value) {
+  let text = String(value ?? '').normalize('NFKC');
+
+  // 漢字の読み仮名辞書を使って検索できるようにする
+  for (const [kanji, kana] of Object.entries(YOMI_DICT)) {
+    text = text.replaceAll(kanji, kana);
+  }
+
+  // ひらがなをカタカナに統一
+  text = text.replace(/[\u3041-\u3096]/g, ch =>
+    String.fromCharCode(ch.charCodeAt(0) + 0x60)
+  );
+
+  // 空白・大文字小文字の違いを吸収
+  return text
+    .replace(/[ 　\t\r\n]/g, '')
+    .toLocaleLowerCase();
+}}
 
 function getKanaRow(yomi) {
   const c = yomi.charAt(0);
@@ -251,12 +269,11 @@ function getKanaRow(yomi) {
 }
 
 function renderArmor(){
-  const q=$('search').value.trim().toLocaleLowerCase(),part=$('part').value,state=$('state').value;
-  const sortOrder=$('sortOrder').value;
+ const q=normalizeSearchText($('search').value),part=$('part').value,state=$('state').value;
   
   const filtered=armorData.filter(a=>{
     const matches=(v)=>state==='all'||(state==='done'?isVariantDone(a,v.id):!isVariantDone(a,v.id));
-    return (!part||a.kind===part)&&(!q||[a.name,a.armorSet?.name].filter(Boolean).some(s=>s.toLocaleLowerCase().includes(q)))&&variantsFor(a).some(matches)&&(!wishlistOnly||variantsFor(a).some(v=>isVariantWishlisted(a,v.id)))
+    return (!part||a.kind===part)&&(!(!q||[a.name,a.armorSet?.name].filter(Boolean).some(s=>normalizeSearchText(s).includes(q)))&&variantsFor(a).some(matches)&&(!wishlistOnly||variantsFor(a).some(v=>isVariantWishlisted(a,v.id)))
   });
   $('armorList').innerHTML='';
   if(!filtered.length){$('armorList').innerHTML='<div class="loading">条件に合う防具がありません。</div>';$('kanaIndex').style.display='none';return}
