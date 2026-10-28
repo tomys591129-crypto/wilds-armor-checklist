@@ -233,25 +233,6 @@ function getGroupYomi(name) {
     }
   }
   return yomi.normalize('NFKC').replace(/[\u3041-\u3096]/g, m => String.fromCharCode(m.charCodeAt(0) + 0x60));
-/* 検索用：ひらがな・カタカナ・漢字の読みを統一 */
-function normalizeSearchText(value) {
-  let text = String(value ?? '').normalize('NFKC');
-
-  
-function getGroupYomi(name) {
-  let yomi = name;
-
-  for (const [kanji, kana] of Object.entries(YOMI_DICT)) {
-    if (name.includes(kanji)) {
-      yomi = name.replace(kanji, kana);
-      break;
-    }
-  }
-
-  return yomi.normalize('NFKC').replace(
-    /[\u3041-\u3096]/g,
-    m => String.fromCharCode(m.charCodeAt(0) + 0x60)
-  );
 }
 
 /* 検索用：ひらがな・カタカナ・漢字の読みを統一 */
@@ -290,12 +271,17 @@ function getKanaRow(yomi) {
 }
 
 function renderArmor(){
- const q=normalizeSearchText($('search').value),part=$('part').value,state=$('state').value;
+  const q=normalizeSearchText($('search').value),part=$('part').value,state=$('state').value;
+  const sortOrder=$('sortOrder').value;
   
   const filtered=armorData.filter(a=>{
     const matches=(v)=>state==='all'||(state==='done'?isVariantDone(a,v.id):!isVariantDone(a,v.id));
-    return (!part||a.kind===part)&&(!(!q||[a.name,a.armorSet?.name].filter(Boolean).some(s=>normalizeSearchText(s).includes(q)))&&variantsFor(a).some(matches)&&(!wishlistOnly||variantsFor(a).some(v=>isVariantWishlisted(a,v.id)))
+    return (!part||a.kind===part)&&
+           (!q||[a.name,a.armorSet?.name].filter(Boolean).some(s=>normalizeSearchText(s).includes(q)))&&
+           variantsFor(a).some(matches)&&
+           (!wishlistOnly||variantsFor(a).some(v=>isVariantWishlisted(a,v.id)));
   });
+  
   $('armorList').innerHTML='';
   if(!filtered.length){$('armorList').innerHTML='<div class="loading">条件に合う防具がありません。</div>';$('kanaIndex').style.display='none';return}
   
@@ -318,10 +304,14 @@ function renderArmor(){
   
   let sortedGroups = [...groups.entries()];
   let activeRowSet = new Set();
-  if(sortOrder==='game'){sortedGroups.sort((a,b)=>{const ea=GO_INDEX.get(gnorm(a[0])),eb=GO_INDEX.get(gnorm(b[0]));return (ea?ea.order:1e6)-(eb?eb.order:1e6)||a[0].localeCompare(b[0],'ja')})}
-  let unmatchedShown=false;
   
-  if(sortOrder === 'kana') {
+  // ソート処理
+  if(sortOrder==='game'){
+    sortedGroups.sort((a,b)=>{
+      const ea=GO_INDEX.get(gnorm(a[0])),eb=GO_INDEX.get(gnorm(b[0]));
+      return (ea?ea.order:1e6)-(eb?eb.order:1e6)||a[0].localeCompare(b[0],'ja');
+    });
+  } else if(sortOrder === 'kana') {
     sortedGroups.sort((a,b) => {
       const yomiA = getGroupYomi(a[0]);
       const yomiB = getGroupYomi(b[0]);
@@ -333,12 +323,13 @@ function renderArmor(){
     }
   }
   
+  let unmatchedShown=false;
   const kanaIndexContainer = $('kanaIndex');
   kanaIndexContainer.innerHTML = '';
+  
   if (sortOrder === 'kana') {
     kanaIndexContainer.style.display = 'flex';
     const ALL_ROWS = ['あ','か','さ','た','な','は','ま','や','ら','わ','その他'];
-    // データが存在する行のボタンだけを生成する
     const activeRows = ALL_ROWS.filter(r => activeRowSet.has(r));
     
     for(const r of activeRows) {
@@ -372,7 +363,14 @@ function renderArmor(){
   let currentKanaRow = '';
   
   for(const [series,items] of sortedGroups){
-    if(sortOrder==='game'&&!GO_INDEX.has(gnorm(series))&&!unmatchedShown){unmatchedShown=true;const h=document.createElement('div');h.className='kana-header';h.textContent='未照合データ（ゲーム内順が未確定）';$('armorList').append(h)}
+    if(sortOrder==='game'&&!GO_INDEX.has(gnorm(series))&&!unmatchedShown){
+      unmatchedShown=true;
+      const h=document.createElement('div');
+      h.className='kana-header';
+      h.textContent='未照合データ（ゲーム内順が未確定）';
+      $('armorList').append(h);
+    }
+    
     if (sortOrder === 'kana') {
       const row = getKanaRow(getGroupYomi(series));
       if (row !== currentKanaRow) {
@@ -572,7 +570,7 @@ function savePreImportBackup(){
 function externalArmorKeyParts(rawKey){
  const raw=String(rawKey??'');
  if(/下位|low[\s_-]?rank/i.test(raw))return {skip:true};
- let variant='type1'; // 以前は空文字だったが基準を設ける
+ let variant='type1';
  if(/(?:Type2|女性型|女性|female|type_?2)$/i.test(raw))variant='type2';
  else if(/(?:Type1|男性型|男性|male|type_?1)$/i.test(raw))variant='type1';
  
