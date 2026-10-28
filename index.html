@@ -64,6 +64,20 @@ button.variant-label:active { opacity: 0.6; }
 .back-to-top:focus-visible,.material-jump-btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 @media(max-width:420px){.material-jump-nav{gap:5px}.material-jump-btn{padding:9px 4px;font-size:.78rem}.back-to-top{right:10px;bottom:10px;padding:11px 13px;font-size:.82rem}}
 
+
+/* ウィッシュリストの一括登録・解除 */
+.series-heading{display:flex;align-items:stretch;gap:6px;padding:5px;background:#e6f1ef;border-bottom:1px solid var(--line)}
+:root[data-theme="dark"] .series-heading{background:#233a36}
+button.series-heading-title{flex:1;min-width:0;background:transparent;border:0;border-bottom:0;padding:6px;text-align:left;color:#174a47;font:inherit;font-weight:800;cursor:pointer}
+:root[data-theme="dark"] button.series-heading-title{color:#b6eee5}
+.series-wish-toggle,.variant-wish-toggle{flex:0 0 auto;border:1px solid #a68b38;border-radius:7px;padding:6px 8px;background:#fff3c4;color:#604d09;font:inherit;font-size:.68rem;font-weight:800;cursor:pointer;white-space:nowrap;align-self:center}
+.series-wish-toggle[aria-pressed="true"],.variant-wish-toggle[aria-pressed="true"]{background:#f2b90b;color:#2b260f;border-color:#f2b90b}
+:root[data-theme="dark"] .series-wish-toggle,:root[data-theme="dark"] .variant-wish-toggle{background:#3d3a2d;color:#ffe18a;border-color:#a68b38}
+:root[data-theme="dark"] .series-wish-toggle[aria-pressed="true"],:root[data-theme="dark"] .variant-wish-toggle[aria-pressed="true"]{background:#f2b90b;color:#2b260f;border-color:#f2b90b}
+.variant-heading{display:flex;align-items:center;gap:6px;margin:0 0 6px 2px}
+.variant-heading .variant-label{flex:1;min-width:0;margin:0}
+@media(max-width:420px){.series-wish-toggle,.variant-wish-toggle{padding:6px 5px;font-size:.62rem}.series-heading{gap:3px;padding:4px}.variant-heading{gap:4px}}
+
 </style>
 </head>
 <body>
@@ -196,6 +210,7 @@ function variantsFor(a){const e=GO_INDEX.get(gnorm(a?.armorSet?.name));return e&
 function variantKey(a,v){return armorKey(a)+'::'+v}
 function isVariantDone(a,v){return !!player.armorStatus[variantKey(a,v)]||(v==='type1'&&!!player.armorStatus[armorKey(a)])}
 function isVariantWishlisted(a,v){return !!player.wishlist[variantKey(a,v)]||(v==='type1'&&!!player.wishlist[armorKey(a)])}
+function setVariantWishlisted(a,v,wished){const base=armorKey(a),key=variantKey(a,v);if(v==='type1'&&Object.prototype.hasOwnProperty.call(player.wishlist,base))delete player.wishlist[base];player.wishlist[key]=!!wished}
 function isDone(a){return variantsFor(a).every(v=>isVariantDone(a,v.id))}
 function isWishlisted(a){return variantsFor(a).some(v=>isVariantWishlisted(a,v))}
 function armorMaterials(a){return (a.crafting?.materials||[]).map(m=>({id:String(m.item?.id??m.item?.gameId??m.item?.name),name:m.item?.name||'名称不明の素材',quantity:Number(m.quantity)||0})).filter(m=>m.quantity>0)}
@@ -378,33 +393,49 @@ function renderArmor(){
     const wrap=document.createElement('section');wrap.className='armor-series';
     
     const isAllSeriesDone = items.every(a => variantsFor(a).every(v => isVariantDone(a, v.id)));
+    const heading=document.createElement('div');heading.className='series-heading';
     const title=document.createElement('button');
     title.type='button';
-    title.className='series-title';
-    title.title='このシリーズをすべて一括切替';
+    title.className='series-title series-heading-title';
+    title.title='このシリーズの作成状況をすべて一括切替';
     title.innerHTML=`<span>${series}</span><span class="toggle-hint">${isAllSeriesDone ? '一括解除' : '一括登録'}</span>`;
     title.addEventListener('click', () => {
       items.forEach(a => { variantsFor(a).forEach(v => { player.armorStatus[variantKey(a, v.id)] = !isAllSeriesDone; }); });
       savePlayer();
       renderAll();
     });
-    wrap.append(title);
+    const isAllSeriesWishlisted=items.every(a=>variantsFor(a).every(v=>isVariantWishlisted(a,v.id)));
+    const seriesWish=document.createElement('button');seriesWish.type='button';seriesWish.className='series-wish-toggle';
+    seriesWish.textContent=isAllSeriesWishlisted?'★ ウィッシュ解除':'☆ ウィッシュ登録';
+    seriesWish.setAttribute('aria-pressed',String(isAllSeriesWishlisted));
+    seriesWish.setAttribute('aria-label',`${series}のウィッシュリストを一括${isAllSeriesWishlisted?'解除':'登録'}`);
+    seriesWish.title=`このシリーズのウィッシュリストをすべて${isAllSeriesWishlisted?'解除':'登録'}`;
+    seriesWish.addEventListener('click',e=>{e.stopPropagation();items.forEach(a=>variantsFor(a).forEach(v=>setVariantWishlisted(a,v.id,!isAllSeriesWishlisted)));savePlayer();renderAll()});
+    heading.append(title,seriesWish);wrap.append(heading);
     
     for(const v of variantsFor(items[0])){
       const row=document.createElement('div');row.className='series-variant';
       
       const isAllVariantDone = items.every(a => isVariantDone(a, v.id));
+      const headingRow=document.createElement('div');headingRow.className='variant-heading';
       const label=document.createElement('button');
       label.type='button';
       label.className='variant-label';
-      label.title=`${v.label}をすべて一括切替`;
+      label.title=`${v.label}の作成状況をすべて一括切替`;
       label.innerHTML=`<span>${variantsFor(items[0]).length===1?'男女共通':v.label}${genderNote(series,v)}</span><span class="toggle-hint">${isAllVariantDone ? '一括解除' : '一括登録'}</span>`;
       label.addEventListener('click', () => {
         items.forEach(a => { player.armorStatus[variantKey(a, v.id)] = !isAllVariantDone; });
         savePlayer();
         renderAll();
       });
-      row.append(label);
+      const isAllVariantWishlisted=items.every(a=>isVariantWishlisted(a,v.id));
+      const variantWish=document.createElement('button');variantWish.type='button';variantWish.className='variant-wish-toggle';
+      variantWish.textContent=isAllVariantWishlisted?'★ ウィッシュ解除':'☆ ウィッシュ登録';
+      variantWish.setAttribute('aria-pressed',String(isAllVariantWishlisted));
+      variantWish.setAttribute('aria-label',`${v.label}のウィッシュリストを一括${isAllVariantWishlisted?'解除':'登録'}`);
+      variantWish.title=`${v.label}のウィッシュリストをすべて${isAllVariantWishlisted?'解除':'登録'}`;
+      variantWish.addEventListener('click',e=>{e.stopPropagation();items.forEach(a=>setVariantWishlisted(a,v.id,!isAllVariantWishlisted));savePlayer();renderAll()});
+      headingRow.append(label,variantWish);row.append(headingRow);
       
       const parts=document.createElement('div');parts.className='series-parts';
       for(const kind of partOrder){
@@ -417,7 +448,7 @@ function renderArmor(){
         button.addEventListener('click',()=>{player.armorStatus[variantKey(a,v.id)]=!isVariantDone(a,v.id);savePlayer();renderAll()});
         const wish=document.createElement('button');wish.type='button';wish.className='part-wish';wish.textContent=wished?'★':'☆';
         wish.setAttribute('aria-label',wished?'ウィッシュ解除':'ウィッシュに追加');wish.setAttribute('aria-pressed',String(wished));wish.title=wished?'欲しい登録を解除':'欲しいに登録';
-        wish.addEventListener('click',e=>{e.stopPropagation();player.wishlist[variantKey(a,v.id)]=!isVariantWishlisted(a,v.id);savePlayer();renderArmor()});
+        wish.addEventListener('click',e=>{e.stopPropagation();setVariantWishlisted(a,v.id,!isVariantWishlisted(a,v.id));savePlayer();renderArmor()});
         button.append(wish);parts.append(button)
       }
       row.append(parts);wrap.append(row)
