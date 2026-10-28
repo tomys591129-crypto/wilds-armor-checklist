@@ -55,28 +55,21 @@ button.variant-label:active { opacity: 0.6; }
 .material-jump-btn:active{background:var(--teal);color:#fff}
 :root[data-theme="dark"] .material-jump-btn{background:#263a36;color:#e5f5f1;border-color:#49635d}
 :root[data-theme="dark"] .material-jump-btn:first-child{border-color:var(--teal);color:#9de9de}
-.material-shortages,.farm-plan-panel,.material-details{scroll-margin-top:calc(var(--tab-nav-height,64px) + 58px)}
-.shortage-row{grid-template-columns:minmax(0,1fr) auto;border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:var(--panel)}
-.shortage-count{white-space:nowrap;align-self:center;border-radius:7px;padding:6px 9px;background:#fff0ed;color:#9d271e;font-weight:800;font-size:.82rem}
-:root[data-theme="dark"] .shortage-count{background:#4a2927;color:#ffb4a8}
-.shortage-summary{margin-top:-3px;margin-bottom:10px}
+.farm-plan-panel,.material-details{scroll-margin-top:calc(var(--tab-nav-height,64px) + 58px)}
 .back-to-top{position:fixed;right:16px;bottom:16px;z-index:120;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #ffffff55;border-radius:999px;padding:12px 15px;background:var(--teal);color:#fff;box-shadow:0 4px 16px #0003;font:inherit;font-size:.88rem;font-weight:800;cursor:pointer}
 .back-to-top:focus-visible,.material-jump-btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 @media(max-width:420px){.material-jump-nav{gap:5px}.material-jump-btn{padding:9px 4px;font-size:.78rem}.back-to-top{right:10px;bottom:10px;padding:11px 13px;font-size:.82rem}}
 
 
-/* ウィッシュリストの一括登録・解除 */
+/* ウィッシュリストの一括登録・解除：作成状況の「一括登録」バッジと同じ見た目 */
 .series-heading{display:flex;align-items:stretch;gap:6px;padding:5px;background:#e6f1ef;border-bottom:1px solid var(--line)}
 :root[data-theme="dark"] .series-heading{background:#233a36}
 button.series-heading-title{flex:1;min-width:0;background:transparent;border:0;border-bottom:0;padding:6px;text-align:left;color:#174a47;font:inherit;font-weight:800;cursor:pointer}
 :root[data-theme="dark"] button.series-heading-title{color:#b6eee5}
-.series-wish-toggle,.variant-wish-toggle{flex:0 0 auto;border:1px solid #a68b38;border-radius:7px;padding:6px 8px;background:#fff3c4;color:#604d09;font:inherit;font-size:.68rem;font-weight:800;cursor:pointer;white-space:nowrap;align-self:center}
-.series-wish-toggle[aria-pressed="true"],.variant-wish-toggle[aria-pressed="true"]{background:#f2b90b;color:#2b260f;border-color:#f2b90b}
-:root[data-theme="dark"] .series-wish-toggle,:root[data-theme="dark"] .variant-wish-toggle{background:#3d3a2d;color:#ffe18a;border-color:#a68b38}
-:root[data-theme="dark"] .series-wish-toggle[aria-pressed="true"],:root[data-theme="dark"] .variant-wish-toggle[aria-pressed="true"]{background:#f2b90b;color:#2b260f;border-color:#f2b90b}
+.series-wish-toggle,.variant-wish-toggle{flex:0 0 auto;border:0;cursor:pointer;white-space:nowrap;align-self:center}
 .variant-heading{display:flex;align-items:center;gap:6px;margin:0 0 6px 2px}
 .variant-heading .variant-label{flex:1;min-width:0;margin:0}
-@media(max-width:420px){.series-wish-toggle,.variant-wish-toggle{padding:6px 5px;font-size:.62rem}.series-heading{gap:3px;padding:4px}.variant-heading{gap:4px}}
+@media(max-width:420px){.series-heading{gap:3px;padding:4px}.variant-heading{gap:4px}}
 
 </style>
 </head>
@@ -103,10 +96,9 @@ button.series-heading-title{flex:1;min-width:0;background:transparent;border:0;b
 <h2>素材の所持数・不足数</h2>
 <p class="notice">未作成の防具を作るために必要な素材を集計します。ウィッシュリストだけに絞ることもできます。作成済みの防具の素材は必要数から除外されます。</p>
 <div class="filters" style="margin:0 0 8px"><label for="materialScope" class="notice">集計対象</label><select id="materialScope" style="padding:8px;border:1px solid #cbd8d7;border-radius:9px;background:white;color:var(--ink);font:inherit"><option value="all">未作成の防具すべて</option><option value="wishlist">ウィッシュリストのみ</option></select></div>
-<nav class="material-jump-nav" aria-label="素材管理内の移動"><button type="button" class="material-jump-btn" data-material-jump="shortageSection">不足素材</button><button type="button" class="material-jump-btn" data-material-jump="farmPlanSection">素材集めの効率ルート</button></nav>
-<section class="panel material-shortages" id="shortageSection" style="margin:12px 0"><h2>不足素材</h2><p class="notice shortage-summary">不足数が多い素材から順に表示します。所持数を更新すると不足数も更新されます。</p><div id="shortageList" class="material-list"><div class="loading">防具データ読み込み後に表示します。</div></div></section>
+<nav class="material-jump-nav" aria-label="素材管理内の移動"><button type="button" class="material-jump-btn" data-material-jump="allMaterialsSection">必要素材・所持数</button><button type="button" class="material-jump-btn" data-material-jump="farmPlanSection">素材集めの効率ルート</button></nav>
+<section class="panel material-details" id="allMaterialsSection" style="margin:12px 0"><h2>必要素材・所持数の詳細</h2><p class="notice">不足数が多い素材から順に表示します。所持数の入力と各素材の入手先確認はこちらから行えます。</p><div id="materialList" class="material-list"><div class="loading">防具データ読み込み後に表示します。</div></div></section>
 <section class="panel farm-plan-panel" id="farmPlanSection" style="margin:12px 0;background:#f8fbfa"><h2>素材集めの効率ルート</h2><p class="notice">不足している素材を複数まとめて狙えるモンスターを表示します。所持数を更新すると、不足数とおすすめ順も更新されます。</p><div id="farmPlan" class="material-list"><div class="loading">モンスター報酬データを読み込み中…</div></div></section>
-<section class="panel material-details" id="allMaterialsSection" style="margin:12px 0"><h2>必要素材・所持数の詳細</h2><p class="notice">所持数の入力と各素材の入手先確認はこちらから行えます。</p><div id="materialList" class="material-list"><div class="loading">防具データ読み込み後に表示します。</div></div></section>
 </section>
 <section class="panel tab-panel" id="panel-backup" data-tab-panel="backup">
 <h2>データのバックアップ・復元</h2><p class="notice">作成状況と素材所持数はこのブラウザに保存されます。機種変更・ブラウザデータ消去に備えて、定期的にJSONを保存してください。バックアップにはゲームのマスターデータは含まず、個人の進捗のみを保存します。</p>
@@ -405,8 +397,8 @@ function renderArmor(){
       renderAll();
     });
     const isAllSeriesWishlisted=items.every(a=>variantsFor(a).every(v=>isVariantWishlisted(a,v.id)));
-    const seriesWish=document.createElement('button');seriesWish.type='button';seriesWish.className='series-wish-toggle';
-    seriesWish.textContent=isAllSeriesWishlisted?'★ ウィッシュ解除':'☆ ウィッシュ登録';
+    const seriesWish=document.createElement('button');seriesWish.type='button';seriesWish.className='series-wish-toggle toggle-hint';
+    seriesWish.textContent=isAllSeriesWishlisted?'★ 一括解除':'☆ 一括登録';
     seriesWish.setAttribute('aria-pressed',String(isAllSeriesWishlisted));
     seriesWish.setAttribute('aria-label',`${series}のウィッシュリストを一括${isAllSeriesWishlisted?'解除':'登録'}`);
     seriesWish.title=`このシリーズのウィッシュリストをすべて${isAllSeriesWishlisted?'解除':'登録'}`;
@@ -429,8 +421,8 @@ function renderArmor(){
         renderAll();
       });
       const isAllVariantWishlisted=items.every(a=>isVariantWishlisted(a,v.id));
-      const variantWish=document.createElement('button');variantWish.type='button';variantWish.className='variant-wish-toggle';
-      variantWish.textContent=isAllVariantWishlisted?'★ ウィッシュ解除':'☆ ウィッシュ登録';
+      const variantWish=document.createElement('button');variantWish.type='button';variantWish.className='variant-wish-toggle toggle-hint';
+      variantWish.textContent=isAllVariantWishlisted?'★ 一括解除':'☆ 一括登録';
       variantWish.setAttribute('aria-pressed',String(isAllVariantWishlisted));
       variantWish.setAttribute('aria-label',`${v.label}のウィッシュリストを一括${isAllVariantWishlisted?'解除':'登録'}`);
       variantWish.title=`${v.label}のウィッシュリストをすべて${isAllVariantWishlisted?'解除':'登録'}`;
@@ -509,21 +501,6 @@ function renderMaterials(){
   return shortageB-shortageA||a.name.localeCompare(b.name,'ja');
  });
  renderFarmPlan(rows);
- const shortageRoot=$('shortageList');shortageRoot.innerHTML='';
- const shortageRows=rows.map(m=>({...m,owned:Number(player.materialsOwned[m.id]||0),shortage:Math.max(0,m.qty-Number(player.materialsOwned[m.id]||0))})).filter(m=>m.shortage>0);
- if(!shortageRows.length){
-  const msg=document.createElement('div');msg.className='loading';
-  msg.textContent=rows.length?'不足している素材はありません。すべて必要数以上を所持しています。':'未作成の防具がないか、素材データがありません。';
-  shortageRoot.append(msg);
- }else{
-  for(const m of shortageRows){
-   const row=document.createElement('div');row.className='material-row shortage-row';
-   const name=document.createElement('div');name.className='material-name';name.textContent=m.name;
-   const sub=document.createElement('span');sub.className='material-sub';sub.textContent=`必要 ${m.qty}｜所持 ${m.owned}`;name.append(sub);
-   const count=document.createElement('div');count.className='shortage-count';count.textContent=`不足 ${m.shortage}`;
-   row.append(name,count);shortageRoot.append(row);
-  }
- }
  $('materialList').innerHTML='';
  if(!rows.length){$('materialList').innerHTML='<div class="loading">未作成の防具がないか、素材データがありません。</div>';return}
 
