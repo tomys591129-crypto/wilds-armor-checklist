@@ -237,6 +237,27 @@ function getGroupYomi(name) {
 function normalizeSearchText(value) {
   let text = String(value ?? '').normalize('NFKC');
 
+  
+function getGroupYomi(name) {
+  let yomi = name;
+
+  for (const [kanji, kana] of Object.entries(YOMI_DICT)) {
+    if (name.includes(kanji)) {
+      yomi = name.replace(kanji, kana);
+      break;
+    }
+  }
+
+  return yomi.normalize('NFKC').replace(
+    /[\u3041-\u3096]/g,
+    m => String.fromCharCode(m.charCodeAt(0) + 0x60)
+  );
+}
+
+/* 検索用：ひらがな・カタカナ・漢字の読みを統一 */
+function normalizeSearchText(value) {
+  let text = String(value ?? '').normalize('NFKC');
+
   // 漢字の読み仮名辞書を使って検索できるようにする
   for (const [kanji, kana] of Object.entries(YOMI_DICT)) {
     text = text.replaceAll(kanji, kana);
@@ -251,7 +272,7 @@ function normalizeSearchText(value) {
   return text
     .replace(/[ 　\t\r\n]/g, '')
     .toLocaleLowerCase();
-}}
+}
 
 function getKanaRow(yomi) {
   const c = yomi.charAt(0);
