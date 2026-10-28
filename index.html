@@ -47,6 +47,23 @@ button.variant-label { background: transparent; padding: 0 0 6px 2px; margin: 0 
 button.variant-label:active { opacity: 0.6; }
 .toggle-hint { font-size: 0.68rem; font-weight: 700; background: #0f766e20; color: var(--teal); padding: 3px 6px; border-radius: 4px; letter-spacing: 0.5px; }
 :root[data-theme="dark"] .toggle-hint { background: #22a99b25; color: #22a99b; }
+
+/* 素材管理：不足素材・効率ルートへの固定ジャンプナビ */
+.material-jump-nav{position:sticky;top:var(--tab-nav-height,64px);z-index:95;display:grid;grid-template-columns:1fr 1.35fr;gap:7px;margin:0 -2px 12px;padding:8px 2px;background:var(--bg);box-shadow:0 4px 9px #102a2812;border-bottom:1px solid var(--line)}
+.material-jump-btn{border:1px solid var(--line);border-radius:9px;padding:10px 8px;background:var(--panel);color:var(--ink);font:inherit;font-size:.85rem;font-weight:750;cursor:pointer}
+.material-jump-btn:first-child{border-color:var(--teal);color:var(--teal)}
+.material-jump-btn:active{background:var(--teal);color:#fff}
+:root[data-theme="dark"] .material-jump-btn{background:#263a36;color:#e5f5f1;border-color:#49635d}
+:root[data-theme="dark"] .material-jump-btn:first-child{border-color:var(--teal);color:#9de9de}
+.material-shortages,.farm-plan-panel,.material-details{scroll-margin-top:calc(var(--tab-nav-height,64px) + 58px)}
+.shortage-row{grid-template-columns:minmax(0,1fr) auto;border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:var(--panel)}
+.shortage-count{white-space:nowrap;align-self:center;border-radius:7px;padding:6px 9px;background:#fff0ed;color:#9d271e;font-weight:800;font-size:.82rem}
+:root[data-theme="dark"] .shortage-count{background:#4a2927;color:#ffb4a8}
+.shortage-summary{margin-top:-3px;margin-bottom:10px}
+.back-to-top{position:fixed;right:16px;bottom:16px;z-index:120;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #ffffff55;border-radius:999px;padding:12px 15px;background:var(--teal);color:#fff;box-shadow:0 4px 16px #0003;font:inherit;font-size:.88rem;font-weight:800;cursor:pointer}
+.back-to-top:focus-visible,.material-jump-btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+@media(max-width:420px){.material-jump-nav{gap:5px}.material-jump-btn{padding:9px 4px;font-size:.78rem}.back-to-top{right:10px;bottom:10px;padding:11px 13px;font-size:.82rem}}
+
 </style>
 </head>
 <body>
@@ -72,8 +89,10 @@ button.variant-label:active { opacity: 0.6; }
 <h2>素材の所持数・不足数</h2>
 <p class="notice">未作成の防具を作るために必要な素材を集計します。ウィッシュリストだけに絞ることもできます。作成済みの防具の素材は必要数から除外されます。</p>
 <div class="filters" style="margin:0 0 8px"><label for="materialScope" class="notice">集計対象</label><select id="materialScope" style="padding:8px;border:1px solid #cbd8d7;border-radius:9px;background:white;color:var(--ink);font:inherit"><option value="all">未作成の防具すべて</option><option value="wishlist">ウィッシュリストのみ</option></select></div>
-<section class="panel" style="margin:12px 0;background:#f8fbfa"><h2>素材集めの効率ルート</h2><p class="notice">不足している素材を複数まとめて狙えるモンスターを表示します。所持数を更新すると、不足数とおすすめ順も更新されます。</p><div id="farmPlan" class="material-list"><div class="loading">モンスター報酬データを読み込み中…</div></div></section>
-<div id="materialList" class="material-list"><div class="loading">防具データ読み込み後に表示します。</div></div>
+<nav class="material-jump-nav" aria-label="素材管理内の移動"><button type="button" class="material-jump-btn" data-material-jump="shortageSection">不足素材</button><button type="button" class="material-jump-btn" data-material-jump="farmPlanSection">素材集めの効率ルート</button></nav>
+<section class="panel material-shortages" id="shortageSection" style="margin:12px 0"><h2>不足素材</h2><p class="notice shortage-summary">不足数が多い素材から順に表示します。所持数を更新すると不足数も更新されます。</p><div id="shortageList" class="material-list"><div class="loading">防具データ読み込み後に表示します。</div></div></section>
+<section class="panel farm-plan-panel" id="farmPlanSection" style="margin:12px 0;background:#f8fbfa"><h2>素材集めの効率ルート</h2><p class="notice">不足している素材を複数まとめて狙えるモンスターを表示します。所持数を更新すると、不足数とおすすめ順も更新されます。</p><div id="farmPlan" class="material-list"><div class="loading">モンスター報酬データを読み込み中…</div></div></section>
+<section class="panel material-details" id="allMaterialsSection" style="margin:12px 0"><h2>必要素材・所持数の詳細</h2><p class="notice">所持数の入力と各素材の入手先確認はこちらから行えます。</p><div id="materialList" class="material-list"><div class="loading">防具データ読み込み後に表示します。</div></div></section>
 </section>
 <section class="panel tab-panel" id="panel-backup" data-tab-panel="backup">
 <h2>データのバックアップ・復元</h2><p class="notice">作成状況と素材所持数はこのブラウザに保存されます。機種変更・ブラウザデータ消去に備えて、定期的にJSONを保存してください。バックアップにはゲームのマスターデータは含まず、個人の進捗のみを保存します。</p>
@@ -81,6 +100,7 @@ button.variant-label:active { opacity: 0.6; }
 </section>
 <section class="panel tab-panel" id="panel-reconcile" data-tab-panel="reconcile"><h2>データ照合</h2><p class="notice">防具データ（API＋確認済み情報）と、動画から読み取ったゲーム内順を突き合わせた結果です。動画に無い防具も削除せず保持します。ここは確認用で、作成状況などの保存データは変更しません。</p><div id="reconcileBody"></div></section></main>
 <footer>防具データ提供元：Monster Hunter Database API（wilds.mhdb.io）。ファン制作の非公式ツールであり、CAPCOM公式ではありません。APIの内容・日本語訳・ゲーム更新との一致は完全性を保証できません。</footer>
+<button type="button" id="backToTop" class="back-to-top" aria-label="ページの一番上へ戻る" title="ページの一番上へ戻る">↑ 一番上へ</button>
 <script>
 const API_URLS=['https://wilds.mhdb.io/ja/armor','https://wilds.mhdb.io/en/armor'];
 const PARTS={head:'頭',chest:'胴',arms:'腕',waist:'腰',legs:'脚'};
@@ -233,45 +253,14 @@ function getGroupYomi(name) {
     }
   }
   return yomi.normalize('NFKC').replace(/[\u3041-\u3096]/g, m => String.fromCharCode(m.charCodeAt(0) + 0x60));
-/* 検索用：ひらがな・カタカナ・漢字の読みを統一 */
-function normalizeSearchText(value) {
-  let text = String(value ?? '').normalize('NFKC');
-
-  
-function getGroupYomi(name) {
-  let yomi = name;
-
-  for (const [kanji, kana] of Object.entries(YOMI_DICT)) {
-    if (name.includes(kanji)) {
-      yomi = name.replace(kanji, kana);
-      break;
-    }
-  }
-
-  return yomi.normalize('NFKC').replace(
-    /[\u3041-\u3096]/g,
-    m => String.fromCharCode(m.charCodeAt(0) + 0x60)
-  );
 }
 
 /* 検索用：ひらがな・カタカナ・漢字の読みを統一 */
 function normalizeSearchText(value) {
   let text = String(value ?? '').normalize('NFKC');
-
-  // 漢字の読み仮名辞書を使って検索できるようにする
-  for (const [kanji, kana] of Object.entries(YOMI_DICT)) {
-    text = text.replaceAll(kanji, kana);
-  }
-
-  // ひらがなをカタカナに統一
-  text = text.replace(/[\u3041-\u3096]/g, ch =>
-    String.fromCharCode(ch.charCodeAt(0) + 0x60)
-  );
-
-  // 空白・大文字小文字の違いを吸収
-  return text
-    .replace(/[ 　\t\r\n]/g, '')
-    .toLocaleLowerCase();
+  for (const [kanji, kana] of Object.entries(YOMI_DICT)) text = text.replaceAll(kanji, kana);
+  text = text.replace(/[\u3041-\u3096]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60));
+  return text.replace(/[ 　\t\r\n]/g, '').toLocaleLowerCase();
 }
 
 function getKanaRow(yomi) {
@@ -294,7 +283,7 @@ function renderArmor(){
   
   const filtered=armorData.filter(a=>{
     const matches=(v)=>state==='all'||(state==='done'?isVariantDone(a,v.id):!isVariantDone(a,v.id));
-    return (!part||a.kind===part)&&(!(!q||[a.name,a.armorSet?.name].filter(Boolean).some(s=>normalizeSearchText(s).includes(q)))&&variantsFor(a).some(matches)&&(!wishlistOnly||variantsFor(a).some(v=>isVariantWishlisted(a,v.id)))
+    return (!part||a.kind===part)&&(!q||[a.name,a.armorSet?.name].filter(Boolean).some(s=>normalizeSearchText(s).includes(q)))&&variantsFor(a).some(matches)&&(!wishlistOnly||variantsFor(a).some(v=>isVariantWishlisted(a,v.id)))
   });
   $('armorList').innerHTML='';
   if(!filtered.length){$('armorList').innerHTML='<div class="loading">条件に合う防具がありません。</div>';$('kanaIndex').style.display='none';return}
@@ -483,8 +472,28 @@ function renderMaterials(){
    }
   }
  }
- const rows=[...need.values()].sort((a,b)=>a.name.localeCompare(b.name,'ja'));
- renderFarmPlan(rows);$('materialList').innerHTML='';
+ const rows=[...need.values()].sort((a,b)=>{
+  const shortageA=Math.max(0,a.qty-Number(player.materialsOwned[a.id]||0));
+  const shortageB=Math.max(0,b.qty-Number(player.materialsOwned[b.id]||0));
+  return shortageB-shortageA||a.name.localeCompare(b.name,'ja');
+ });
+ renderFarmPlan(rows);
+ const shortageRoot=$('shortageList');shortageRoot.innerHTML='';
+ const shortageRows=rows.map(m=>({...m,owned:Number(player.materialsOwned[m.id]||0),shortage:Math.max(0,m.qty-Number(player.materialsOwned[m.id]||0))})).filter(m=>m.shortage>0);
+ if(!shortageRows.length){
+  const msg=document.createElement('div');msg.className='loading';
+  msg.textContent=rows.length?'不足している素材はありません。すべて必要数以上を所持しています。':'未作成の防具がないか、素材データがありません。';
+  shortageRoot.append(msg);
+ }else{
+  for(const m of shortageRows){
+   const row=document.createElement('div');row.className='material-row shortage-row';
+   const name=document.createElement('div');name.className='material-name';name.textContent=m.name;
+   const sub=document.createElement('span');sub.className='material-sub';sub.textContent=`必要 ${m.qty}｜所持 ${m.owned}`;name.append(sub);
+   const count=document.createElement('div');count.className='shortage-count';count.textContent=`不足 ${m.shortage}`;
+   row.append(name,count);shortageRoot.append(row);
+  }
+ }
+ $('materialList').innerHTML='';
  if(!rows.length){$('materialList').innerHTML='<div class="loading">未作成の防具がないか、素材データがありません。</div>';return}
 
  for(const m of rows){
@@ -685,7 +694,31 @@ $('importFile').addEventListener('change',async e=>{
  }
 });
 $('reset').addEventListener('click',()=>{if(confirm('このブラウザに保存された作成状況と素材所持数をすべてリセットします。よろしいですか？')){player={armorStatus:{},materialsOwned:{},wishlist:{}};savePlayer();renderAll()}});
-document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{const tab=btn.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b===btn)));document.querySelectorAll('[data-tab-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.tabPanel===tab))}));
+function updateStickyOffsets(){
+ const nav=document.querySelector('.tab-nav');
+ if(nav)document.documentElement.style.setProperty('--tab-nav-height',Math.ceil(nav.getBoundingClientRect().height)+'px');
+}
+function updateBackToTop(tab){
+ const btn=$('backToTop');if(!btn)return;
+ const active=tab||document.querySelector('[data-tab][aria-selected="true"]')?.dataset.tab||'armor';
+ btn.style.display=(active==='armor'||active==='materials')?'inline-flex':'none';
+}
+document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{
+ const tab=btn.dataset.tab;
+ document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b===btn)));
+ document.querySelectorAll('[data-tab-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.tabPanel===tab));
+ updateBackToTop(tab);updateStickyOffsets();
+}));
+document.querySelectorAll('[data-material-jump]').forEach(btn=>btn.addEventListener('click',()=>{
+ const target=$(btn.dataset.materialJump);if(!target)return;
+ const tabNav=document.querySelector('.tab-nav'),jumpNav=document.querySelector('.material-jump-nav');
+ const offset=(tabNav?.offsetHeight||0)+(jumpNav?.offsetHeight||0)+12;
+ const y=target.getBoundingClientRect().top+window.scrollY-offset;
+ window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+}));
+$('backToTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+window.addEventListener('resize',updateStickyOffsets);
+updateStickyOffsets();updateBackToTop('armor');
 loadPlayer();loadData();loadMonsterSources();
 </script>
 </body></html>
