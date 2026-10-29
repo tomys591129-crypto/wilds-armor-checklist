@@ -86,7 +86,7 @@ button.series-heading-title{flex:1;min-width:0;background:transparent;border:0;b
 <h2>進捗</h2><div class="stats"><div class="stat"><b id="total">—</b><span>防具総数</span></div><div class="stat"><b id="made">0</b><span>作成済み</span></div><div class="stat"><b id="todo">0</b><span>未作成</span></div><div class="stat"><b id="rate">0%</b><span>進捗率</span></div></div>
 <p id="status" class="notice">日本語の防具データを読み込み中…初回は少し時間がかかることがあります。</p>
 </section>
-<nav class="tab-nav wide" role="tablist" aria-label="管理画面"><button type="button" class="tab-btn" role="tab" id="tab-armor" aria-controls="panel-armor" aria-selected="true" data-tab="armor">防具一覧</button><button type="button" class="tab-btn" role="tab" id="tab-materials" aria-controls="panel-materials" aria-selected="false" data-tab="materials">素材管理</button><button type="button" class="tab-btn" role="tab" id="tab-backup" aria-controls="panel-backup" aria-selected="false" data-tab="backup">バックアップ</button><button type="button" class="tab-btn" role="tab" id="tab-reconcile" aria-controls="panel-reconcile" aria-selected="false" data-tab="reconcile">データ照合</button></nav>
+<nav class="tab-nav wide" role="tablist" aria-label="管理画面"><button type="button" class="tab-btn" role="tab" id="tab-armor" aria-controls="panel-armor" aria-selected="true" data-tab="armor">防具一覧</button><button type="button" class="tab-btn" role="tab" id="tab-materials" aria-controls="panel-materials" aria-selected="false" data-tab="materials">素材管理</button><button type="button" class="tab-btn" role="tab" id="tab-backup" aria-controls="panel-backup" aria-selected="false" data-tab="backup">バックアップ</button></nav>
 <section class="panel tab-panel active" id="panel-armor" data-tab-panel="armor">
 <h2>防具一覧</h2>
 <div class="controls"><input id="search" placeholder="シリーズ名で検索（防具名も検索対象）">
@@ -110,7 +110,7 @@ button.series-heading-title{flex:1;min-width:0;background:transparent;border:0;b
 <h2>データのバックアップ・復元</h2><p class="notice">作成状況と素材所持数はこのブラウザに保存されます。機種変更・ブラウザデータ消去に備えて、定期的にJSONを保存してください。バックアップにはゲームのマスターデータは含まず、個人の進捗のみを保存します。</p>
 <div class="toolbar"><button class="btn" id="export">進捗をJSON保存</button><button class="btn secondary" id="importBtn">JSONを読み込む</button><input id="importFile" type="file" accept=".json,application/json" hidden><button class="btn warn" id="reset">進捗をリセット</button></div>
 </section>
-<section class="panel tab-panel" id="panel-reconcile" data-tab-panel="reconcile"><h2>データ照合</h2><p class="notice">防具データ（API＋確認済み情報）と、動画から読み取ったゲーム内順を突き合わせた結果です。動画に無い防具も削除せず保持します。ここは確認用で、作成状況などの保存データは変更しません。</p><div id="reconcileBody"></div></section></main>
+</main>
 <footer>防具データ提供元：Monster Hunter Database API（wilds.mhdb.io）。ファン制作の非公式ツールであり、CAPCOM公式ではありません。APIの内容・日本語訳・ゲーム更新との一致は完全性を保証できません。</footer>
 <button type="button" id="backToTop" class="back-to-top" aria-label="ページの一番上へ戻る" title="ページの一番上へ戻る">↑ 一番上へ</button>
 <script>
@@ -183,20 +183,6 @@ let rawArmorData=[];
 const gnorm=s=>String(s??'').normalize('NFKC').replace(/\s+/g,'').toLowerCase();
 const GO_INDEX=new Map(GAME_ORDER.series.map(s=>[gnorm(s.label),s]));
 function genderNote(series,v){const e=GO_INDEX.get(gnorm(series));if(!e||v.id!=='type1'||e.genderMode==='split-observed'||e.genderMode==='unisex-confirmed')return'';if(e.genderMode==='unisex-ui')return' <small>（画面表示にもとづく・未確認）</small>';return' <small>（男女共通の可能性・要確認）</small>'}
-function renderReconcile(){const root=$('reconcileBody');if(!root)return;root.innerHTML='';
- if(!rawArmorData.length){root.textContent='防具データの取得後に表示されます。';return}
- const r=WildsReconcile.reconcile({apiArmors:rawArmorData,order:GAME_ORDER,master:ARMOR_MASTER});
- const sum=document.createElement('p');sum.className='notice';sum.textContent=`一致 ${r.matched.length}／データのみ ${r.masterOnly.length}／動画のみ ${r.orderOnly.length}／不一致の可能性 ${r.mismatch.length}／対象外(低ランク) ${r.nonTarget.length}`;root.append(sum);
- const add=(title,items,help)=>{const d=document.createElement('details');d.className='material-source';const s=document.createElement('summary');s.textContent=`${title}（${items.length}）`;d.append(s);if(help){const p=document.createElement('div');p.className='material-sub';p.textContent=help;d.append(p)}for(const t of items){const l=document.createElement('div');l.className='source-line';l.textContent=t;d.append(l)}root.append(d)};
- add('一致（動画とデータの両方にある）',r.matched.map(m=>`${m.order}. ${m.key}${m.flags.length?'　⚠ '+m.flags.join(' / '):''}`));
- add('データにあるが動画にない（順番未確定・未確認装備）',r.masterOnly.map(m=>`${m.key}（${m.origin.join('+')}）`),'削除せず保持します。隠し装備・イベント・未解放の可能性があります。');
- add('動画にあるがデータに見つからない',r.orderOnly.map(o=>`${o.order}. ${o.label}${o.check?'　要確認：'+o.check:''}`),'名前の違い、またはAPI未収録の可能性があります。');
- add('名前・バリエーションの不一致の可能性',r.mismatch.map(m=>`${m.order}. ${m.label} ↔ ${m.candidates.join('、')}`),'自動では結びつけていません。');
- add('対象外（低ランク）',r.nonTarget);
- add('警告',r.warnings);
- add('API外で確認した防具（出典つき）',ARMOR_MASTER.series.filter(s=>!s.apiSetId).map(s=>`${s.key}：${s.sources.map(x=>x.checkedAt+' '+x.type+' 確度'+x.confidence+(x.note?'・'+x.note:'')).join(' ／ ')}`));
-}
-
 let armorData=[],langUsed='ja',sourceMap=new Map(),sourcesLoaded=false,sourcesError=false;
 let player={armorStatus:{},materialsOwned:{},wishlist:{}},wishlistOnly=false;
 const $=id=>document.getElementById(id);const THEME_KEY='wilds-armor-checklist-theme';function applyTheme(theme){document.documentElement.dataset.theme=theme;$('themeToggle').textContent=theme==='dark'?'☀ ライト':'☾ ダーク';localStorage.setItem(THEME_KEY,theme)}$('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));applyTheme(localStorage.getItem(THEME_KEY)||'light');
@@ -589,7 +575,7 @@ function renderMaterials(){
  }
 }
 
-function renderAll(){renderStats();renderArmor();renderMaterials();renderReconcile()}
+function renderAll(){renderStats();renderArmor();renderMaterials()}
 $('search').addEventListener('input',renderArmor);
 $('part').addEventListener('change',renderArmor);
 $('state').addEventListener('change',renderArmor);
